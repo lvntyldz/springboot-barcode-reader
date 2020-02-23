@@ -20,6 +20,6 @@ public class FileUtils {
     }
 
     private static String getFullOutputFilePath(String name) {
-        return Config.TARGET_DIR + name + JPG_FULL_EX;
+        return Config.TEMP_DIR + name + JPG_FULL_EX;
     }
 }
