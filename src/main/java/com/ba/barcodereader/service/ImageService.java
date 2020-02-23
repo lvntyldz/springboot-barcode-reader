@@ -4,7 +4,6 @@ package com.ba.barcodereader.service;
 import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
-import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.util.ImageUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -17,7 +16,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -35,17 +33,7 @@ public class ImageService {
     private static Map<DecodeHintType, Object> hintsMap;
 
     public void readBarcodeFromScannedImage() throws Exception {
-        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-
-        //image = imageService.rotateImage(image, 90);
-        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
-
-        if (Dimensions.BARCODE_FRAME_X.getVal() + Dimensions.BARCODE_FRAME_W.getVal() > image.getWidth() || Dimensions.BARCODE_FRAME_Y.getVal() + Dimensions.BARCODE_FRAME_H.getVal() > image.getHeight()) {
-            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
-        }
-
-        image = image.getSubimage(Dimensions.BARCODE_FRAME_X.getVal(), Dimensions.BARCODE_FRAME_Y.getVal(), Dimensions.BARCODE_FRAME_W.getVal(), Dimensions.BARCODE_FRAME_H.getVal());
-        //imageHelper.displayScrollableImage(image);
+        BufferedImage image = imageHelper.readScannedImageGetBarcodePart();
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
         searchWhiteFrameInMainImage(image);

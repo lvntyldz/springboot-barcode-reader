@@ -1,13 +1,32 @@
 package com.ba.barcodereader.helper;
 
+import com.ba.barcodereader.enums.Dimensions;
+import com.ba.barcodereader.props.Config;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 
 @Component
 public class ImageHelper {
+
+    public BufferedImage readScannedImageGetBarcodePart() throws Exception {
+        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+
+        //image = imageService.rotateImage(image, 90);
+        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+
+        if (Dimensions.BARCODE_FRAME_X.getVal() + Dimensions.BARCODE_FRAME_W.getVal() > image.getWidth() || Dimensions.BARCODE_FRAME_Y.getVal() + Dimensions.BARCODE_FRAME_H.getVal() > image.getHeight()) {
+            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
+        }
+
+        image = image.getSubimage(Dimensions.BARCODE_FRAME_X.getVal(), Dimensions.BARCODE_FRAME_Y.getVal(), Dimensions.BARCODE_FRAME_W.getVal(), Dimensions.BARCODE_FRAME_H.getVal());
+        //imageHelper.displayScrollableImage(image);
+        return image;
+    }
 
     public void displayScrollableImage(BufferedImage image) {
         JFrame frame = new JFrame();
