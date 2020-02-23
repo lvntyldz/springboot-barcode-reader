@@ -2,8 +2,8 @@ package com.ba.barcodereader.service;
 
 
 import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
-import com.ba.barcodereader.util.FileUtils;
 import com.ba.barcodereader.util.ImageUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -26,6 +26,9 @@ public class ImageService {
 
     @Autowired
     ImageHelper imageHelper;
+
+    @Autowired
+    FileHelper fileHelper;
 
     private static Map<DecodeHintType, Object> hintsMap;
 
@@ -64,27 +67,19 @@ public class ImageService {
 
         if (isHasWhiteFrame) {
             imageHelper.displayScrollableImage(subimage);
-            String subImagePath = FileUtils.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
+            String subImagePath = fileHelper.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
             tryReadDataMatrix(subImagePath);
         }
     }
 
     private void tryReadDataMatrix(String filePath) {
 
-        if (1 == 1) {
-            //return;
-        }
-
-        //TODO:Remove
-        //filePath = "/Users/leventyildiz/development/git/tofas/barcodeDetection/target/image-45-360.jpg";
-
         Map<DecodeHintType, Object> hintsMap;
         BufferedImage before = null;
         hintsMap = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
         hintsMap.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
         hintsMap.put(DecodeHintType.POSSIBLE_FORMATS, EnumSet.allOf(BarcodeFormat.class));
-        //hintsMap.put(DecodeHintType.POSSIBLE_FORMATS, EnumSet.of(BarcodeFormat.DATA_MATRIX));
-        //hintsMap.put(DecodeHintType.PURE_BARCODE, Boolean.FALSE);
+
         try {
             before = ImageIO.read(new File(filePath));
             decode(before);
@@ -101,9 +96,8 @@ public class ImageService {
                 decode(after);
             }
 
-            //tmpBfrImage = tmpBfrImage.getSubimage(200, 100, 800, 800);
-        } catch (IOException tmpIoe) {
-            tmpIoe.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

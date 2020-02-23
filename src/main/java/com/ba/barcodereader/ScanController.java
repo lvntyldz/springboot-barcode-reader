@@ -1,12 +1,11 @@
 package com.ba.barcodereader;
 
 import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
-import com.ba.barcodereader.util.FileUtils;
-import com.ba.barcodereader.util.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +27,9 @@ public class ScanController {
 
     @Autowired
     ImageHelper imageHelper;
+
+    @Autowired
+    FileHelper fileHelper;
 
     @GetMapping
     public String hello() {
@@ -60,7 +62,7 @@ public class ScanController {
         BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
 
         image = imageService.rotateImage(image, 90);
-        FileUtils.writeToTargetAsJpg(image, "rotatedImage");
+        fileHelper.writeToTargetAsJpg(image, "rotatedImage");
 
         if (Dim.BARCODE_FRAME_X.getVal() + Dim.BARCODE_FRAME_W.getVal() > image.getWidth() || Dim.BARCODE_FRAME_Y.getVal() + Dim.BARCODE_FRAME_H.getVal() > image.getHeight()) {
             throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
@@ -69,7 +71,7 @@ public class ScanController {
         image = image.getSubimage(Dim.BARCODE_FRAME_X.getVal(), Dim.BARCODE_FRAME_Y.getVal(), Dim.BARCODE_FRAME_W.getVal(), Dim.BARCODE_FRAME_H.getVal());
         imageHelper.displayScrollableImage(image);
 
-        FileUtils.writeToTargetAsJpg(image, "croppedImage");
+        fileHelper.writeToTargetAsJpg(image, "croppedImage");
         imageService.searchWhiteFrameInMainImage(image);
 
         System.out.println("bitti!");
