@@ -1,7 +1,7 @@
 package com.ba.barcodereader.service;
 
 
-import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.util.ImageUtils;
@@ -39,11 +39,11 @@ public class ImageService {
         for (int y = 0; y < height; y = y + 15) {
             for (int x = 0; x < width; x = x + 15) {
 
-                if (x + Dim.SUB_IMAGE_DIMENSION.getVal() > width || y + Dim.SUB_IMAGE_DIMENSION.getVal() > height) {
+                if (x + Dimensions.SUB_IMAGE_DIMENSION.getVal() > width || y + Dimensions.SUB_IMAGE_DIMENSION.getVal() > height) {
                     continue;
                 }
 
-                BufferedImage subimage = image.getSubimage(x, y, Dim.SUB_IMAGE_DIMENSION.getVal(), Dim.SUB_IMAGE_DIMENSION.getVal());
+                BufferedImage subimage = image.getSubimage(x, y, Dimensions.SUB_IMAGE_DIMENSION.getVal(), Dimensions.SUB_IMAGE_DIMENSION.getVal());
                 checkWhiteFrameAndwriteToFile(x, y, subimage);
             }
         }
@@ -58,7 +58,7 @@ public class ImageService {
         for (int i = 0; i < subimageWidth; i++) {
             for (int j = 0; j < subimageHeight; j++) {
 
-                if ((i == 0 || j == 0 || i + 1 == subimageWidth || j + 1 == subimageHeight) && !ImageUtils.isWhiteColor(subimage, i, j, Dim.RGB_WHITE_THRESHOLD.getVal())) {
+                if ((i == 0 || j == 0 || i + 1 == subimageWidth || j + 1 == subimageHeight) && !ImageUtils.isWhiteColor(subimage, i, j, Dimensions.RGB_WHITE_THRESHOLD.getVal())) {
                     isHasWhiteFrame = false;
                     break;
                 }

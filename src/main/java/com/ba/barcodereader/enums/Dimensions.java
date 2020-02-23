@@ -1,6 +1,6 @@
 package com.ba.barcodereader.enums;
 
-public enum Dim {
+public enum Dimensions {
 
     //barcode frame dimensions
     BARCODE_FRAME_X(0),
@@ -14,7 +14,7 @@ public enum Dim {
 
     private int val;
 
-    Dim(int val) {
+    Dimensions(int val) {
         this.val = val;
     }
 
