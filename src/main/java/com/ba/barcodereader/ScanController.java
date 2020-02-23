@@ -1,6 +1,7 @@
 package com.ba.barcodereader;
 
 import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
@@ -24,6 +25,9 @@ public class ScanController {
 
     @Autowired
     ImageService imageService;
+
+    @Autowired
+    ImageHelper imageHelper;
 
     @GetMapping
     public String hello() {
@@ -63,7 +67,7 @@ public class ScanController {
         }
 
         image = image.getSubimage(Dim.BARCODE_FRAME_X.getVal(), Dim.BARCODE_FRAME_Y.getVal(), Dim.BARCODE_FRAME_W.getVal(), Dim.BARCODE_FRAME_H.getVal());
-        ImageUtils.displayScrollableImage(image);
+        imageHelper.displayScrollableImage(image);
 
         FileUtils.writeToTargetAsJpg(image, "croppedImage");
         imageService.searchWhiteFrameInMainImage(image);

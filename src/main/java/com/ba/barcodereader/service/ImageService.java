@@ -2,11 +2,13 @@ package com.ba.barcodereader.service;
 
 
 import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.util.FileUtils;
 import com.ba.barcodereader.util.ImageUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -21,6 +23,9 @@ import java.util.Map;
 
 @Service
 public class ImageService {
+
+    @Autowired
+    ImageHelper imageHelper;
 
     private static Map<DecodeHintType, Object> hintsMap;
 
@@ -58,7 +63,7 @@ public class ImageService {
         }
 
         if (isHasWhiteFrame) {
-            ImageUtils.displayScrollableImage(subimage);
+            imageHelper.displayScrollableImage(subimage);
             String subImagePath = FileUtils.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
             tryReadDataMatrix(subImagePath);
         }
