@@ -69,7 +69,7 @@ public class ScanController {
         }
 
         image = image.getSubimage(Dimensions.BARCODE_FRAME_X.getVal(), Dimensions.BARCODE_FRAME_Y.getVal(), Dimensions.BARCODE_FRAME_W.getVal(), Dimensions.BARCODE_FRAME_H.getVal());
-        imageHelper.displayScrollableImage(image);
+        //imageHelper.displayScrollableImage(image);
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
         imageService.searchWhiteFrameInMainImage(image);

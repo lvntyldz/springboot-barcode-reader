@@ -66,7 +66,7 @@ public class ImageService {
         }
 
         if (isHasWhiteFrame) {
-            imageHelper.displayScrollableImage(subimage);
+            //imageHelper.displayScrollableImage(subimage);
             String subImagePath = fileHelper.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
             tryReadDataMatrix(subImagePath);
         }
