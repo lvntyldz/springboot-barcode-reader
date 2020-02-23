@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
         <zxing.version>3.4.0</zxing.version>
         <javase.version>3.4.0</javase.version>
+        <tess4j.version>4.4.1</tess4j.version>
     </properties>
 
     <dependencies>
@@ -49,6 +50,13 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>${javase.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.tess4j/tess4j -->
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>${tess4j.version}</version>
         </dependency>
 
     </dependencies>

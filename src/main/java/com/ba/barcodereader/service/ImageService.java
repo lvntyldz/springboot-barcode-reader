@@ -4,10 +4,13 @@ package com.ba.barcodereader.service;
 import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
+import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.util.ImageUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +20,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ImageService {
@@ -32,7 +33,61 @@ public class ImageService {
 
     private static Map<DecodeHintType, Object> hintsMap;
 
-    public void readBarcodeFromScannedImage() throws Exception {
+    public void readBarcodeWithTesseractFromScannedImageVia() throws Exception {
+        BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart();
+
+        fileHelper.writeToTargetAsJpg(subimage, "croppedImage");
+        //searchWhiteFrameInMainImage(image);
+        imageToBlackWhite(subimage);
+
+        String text = getStringFromImage(subimage);
+        List<String> data = getFinalDatas(text);
+        System.out.println("final Data : " + data);
+    }
+
+    private static void imageToBlackWhite(BufferedImage subimage) {
+        for (int xx = 0; xx < subimage.getWidth(); xx++) {
+            for (int yy = 0; yy < subimage.getHeight(); yy++) {
+
+                int clr = subimage.getRGB(xx, yy);
+                int red = (clr & 0x00ff0000) >> 16;
+                int green = (clr & 0x0000ff00) >> 8;
+                int blue = clr & 0x000000ff;
+
+                if (red > Dimensions.RGB_THRESHOLD.getVal() && green > Dimensions.RGB_THRESHOLD.getVal() && blue > Dimensions.RGB_THRESHOLD.getVal()) {
+                    subimage.setRGB(xx, yy, Dimensions.WHITE_COLOR.getVal());
+                    continue;
+                }
+                subimage.setRGB(xx, yy, Dimensions.BLACK_COLOR.getVal());
+            }
+        }
+    }
+
+    private static List<String> getFinalDatas(String text) {
+        List<String> data = new ArrayList<>();
+
+        String[] datasByNewLine = text.split("\n");
+
+        for (String row : datasByNewLine) {
+            String[] allData = row.split(" ");
+            for (String s : allData) {
+                s = s.replaceAll("\\D+", "");//remmove nonDigitData
+                if (s.length() == 11 || s.length() == 12 || s.length() == 13) {
+                    data.add(s);
+                }
+            }
+        }
+
+        return data;
+    }
+
+    private String getStringFromImage(BufferedImage subimage) throws TesseractException {
+        Tesseract tesseract = new Tesseract();
+        tesseract.setDatapath(Config.DATA_FOLDER);
+        return tesseract.doOCR(subimage);
+    }
+
+    public void readBarcodeWithZXingFromScannedImage() throws Exception {
         BufferedImage image = imageHelper.readScannedImageGetBarcodePart();
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
@@ -131,24 +186,4 @@ public class ImageService {
             tmpExcpt.printStackTrace();
         }
     }
-
-    public BufferedImage rotateImage(BufferedImage image, double degrees) {
-
-        final double rads = Math.toRadians(90);
-        final double sin = Math.abs(Math.sin(rads));
-        final double cos = Math.abs(Math.cos(rads));
-        final int w = (int) Math.floor(image.getWidth() * cos + image.getHeight() * sin);
-        final int h = (int) Math.floor(image.getHeight() * cos + image.getWidth() * sin);
-        final BufferedImage rotatedImage = new BufferedImage(w, h, image.getType());
-        final AffineTransform at = new AffineTransform();
-        at.translate(w / 2, h / 2);
-        at.rotate(rads, 0, 0);
-        at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
-        final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        BufferedImage finalBufferedImage = rotateOp.filter(image, rotatedImage);
-
-        return finalBufferedImage;
-    }
-
-
 }

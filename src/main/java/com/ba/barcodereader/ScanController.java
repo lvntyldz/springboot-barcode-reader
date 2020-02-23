@@ -39,7 +39,11 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file/t")
-    public String scanAndReadByTesseract() {
+    public String scanAndReadByTesseract() throws Exception {
+
+        scannerService.scanFileFromScanner();
+        imageService.readBarcodeWithTesseractFromScannedImageVia();
+
         return "scan file and read barcode with tesseract completed";
     }
 
@@ -54,7 +58,7 @@ public class ScanController {
     public String scanAndReadByZebraCrossing() throws Exception {
 
         scannerService.scanFileFromScanner();
-        imageService.readBarcodeFromScannedImage();
+        imageService.readBarcodeWithZXingFromScannedImage();
 
         System.out.println("bitti!");
 

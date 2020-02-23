@@ -7,5 +7,8 @@ public class Config {
     public static final String SCANNED_FILE_PATH = "C:\\twain\\img000001.jpg";
     public static final String SCANNER_EXE_PATH = "kodak\\kodak.scan.exe";
     public static final String TEMP_DIR = "target\\";
+    //public static final String DATA_FOLDER = "/usr/share/tesseract-ocr/4.00/tessdata";//ubuntu
+    //public static final String DATA_FOLDER = "/usr/local/Cellar/tesseract/4.1.1/share/tessdata";//mac
+    public static final String DATA_FOLDER = "C:\\tesseract\\4.1.1\\tessdata";//windows
 
 }
