@@ -1,7 +1,7 @@
 package com.ba.barcodereader;
 
-import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
 import com.ba.barcodereader.util.FileUtils;
@@ -54,6 +54,9 @@ public class ScanController {
     public String scanAndReadByZebraCrossing() throws Exception {
 
         BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+
+        image = imageService.rotateImage(image, 90);
+        FileUtils.writeToTargetAsJpg(image, "rotatedImage");
 
         if (Dim.BARCODE_FRAME_X.getVal() + Dim.BARCODE_FRAME_W.getVal() > image.getWidth() || Dim.BARCODE_FRAME_Y.getVal() + Dim.BARCODE_FRAME_H.getVal() > image.getHeight()) {
             throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
