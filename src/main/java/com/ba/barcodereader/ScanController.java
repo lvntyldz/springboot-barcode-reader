@@ -1,10 +1,19 @@
 package com.ba.barcodereader;
 
+import com.ba.barcodereader.props.Config;
+import com.ba.barcodereader.enums.Dim;
+import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
+import com.ba.barcodereader.util.FileUtils;
+import com.ba.barcodereader.util.ImageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 
 @RestController
 @RequestMapping("/scanner")
@@ -12,6 +21,9 @@ public class ScanController {
 
     @Autowired
     private ScannerService scannerService;
+
+    @Autowired
+    ImageService imageService;
 
     @GetMapping
     public String hello() {
@@ -39,7 +51,22 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file/zx")
-    public String scanAndReadByZebraCrossing() {
+    public String scanAndReadByZebraCrossing() throws Exception {
+
+        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+
+        if (Dim.BARCODE_FRAME_X.getVal() + Dim.BARCODE_FRAME_W.getVal() > image.getWidth() || Dim.BARCODE_FRAME_Y.getVal() + Dim.BARCODE_FRAME_H.getVal() > image.getHeight()) {
+            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
+        }
+
+        image = image.getSubimage(Dim.BARCODE_FRAME_X.getVal(), Dim.BARCODE_FRAME_Y.getVal(), Dim.BARCODE_FRAME_W.getVal(), Dim.BARCODE_FRAME_H.getVal());
+        ImageUtils.displayScrollableImage(image);
+
+        FileUtils.writeToTargetAsJpg(image, "croppedImage");
+        imageService.searchWhiteFrameInMainImage(image);
+
+        System.out.println("bitti!");
+
         return "scan file and read barcode with Google Zebra Crossing API completed";
     }
 }

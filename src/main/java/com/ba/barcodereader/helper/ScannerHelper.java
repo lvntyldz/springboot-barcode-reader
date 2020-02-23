@@ -1,6 +1,6 @@
 package com.ba.barcodereader.helper;
 
-import com.ba.barcodereader.enums.Config;
+import com.ba.barcodereader.props.Config;
 
 import java.io.IOException;
 
