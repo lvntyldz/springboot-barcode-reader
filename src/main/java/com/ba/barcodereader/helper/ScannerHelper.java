@@ -9,8 +9,8 @@ public class ScannerHelper {
     public static void scanFile() {
         try {
             Process process = new ProcessBuilder(Config.SCANNER_EXE_PATH).start();
-            process.destroy();
-        } catch (IOException e) {
+            //process.destroy();
+        } catch (IOException e) {//TODO:Development[Throw custom exception]
             e.printStackTrace();//TODO:Add Logger
         }
     }

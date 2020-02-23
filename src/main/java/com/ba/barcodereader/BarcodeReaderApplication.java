@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootHwApplication {
+public class BarcodeReaderApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootHwApplication.class, args);
+		SpringApplication.run(BarcodeReaderApplication.class, args);
 	}
 }
