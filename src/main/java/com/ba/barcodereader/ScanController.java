@@ -61,8 +61,8 @@ public class ScanController {
 
         BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
 
-        image = imageService.rotateImage(image, 90);
-        fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+        //image = imageService.rotateImage(image, 90);
+        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
 
         if (Dimensions.BARCODE_FRAME_X.getVal() + Dimensions.BARCODE_FRAME_W.getVal() > image.getWidth() || Dimensions.BARCODE_FRAME_Y.getVal() + Dimensions.BARCODE_FRAME_H.getVal() > image.getHeight()) {
             throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO

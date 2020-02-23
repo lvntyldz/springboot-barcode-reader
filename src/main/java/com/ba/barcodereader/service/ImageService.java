@@ -36,8 +36,8 @@ public class ImageService {
         int height = image.getHeight();
         int width = image.getWidth();
 
-        for (int y = 0; y < height; y = y + 15) {
-            for (int x = 0; x < width; x = x + 15) {
+        for (int y = 0; y < height; y = y + 5) {
+            for (int x = 0; x < width; x = x + 5) {
 
                 if (x + Dimensions.SUB_IMAGE_DIMENSION.getVal() > width || y + Dimensions.SUB_IMAGE_DIMENSION.getVal() > height) {
                     continue;
