@@ -25,6 +25,11 @@
         <zxing.version>3.4.0</zxing.version>
         <javase.version>3.4.0</javase.version>
         <tess4j.version>4.4.1</tess4j.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <commons-collections4.version>4.0</commons-collections4.version>
+        <google-api-client.version>1.30.8</google-api-client.version>
+        <google-cloud-vision.version>1.84.0</google-cloud-vision.version>
+        <lombok.version>1.18.12</lombok.version>
     </properties>
 
     <dependencies>
@@ -59,25 +64,38 @@
             <version>${tess4j.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>1.30.8</version>
+            <version>${google-api-client.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-vision</artifactId>
-            <version>1.84.0</version>
+            <version>${google-cloud-vision.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
         </dependency>
 
     </dependencies>
@@ -90,6 +108,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
