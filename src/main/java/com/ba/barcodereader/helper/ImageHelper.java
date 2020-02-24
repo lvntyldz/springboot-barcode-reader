@@ -1,7 +1,7 @@
 package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.enums.Dimensions;
-import com.ba.barcodereader.model.Dimension;
+import com.ba.barcodereader.model.DimensionModel;
 import com.ba.barcodereader.props.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class ImageHelper {
     public BufferedImage readScannedImageGetHeaderPart(final boolean rotate) throws Exception {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        Dimension dim = prepareHeaderImageDimensionBy(image);
+        DimensionModel dim = prepareHeaderImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
         //imageHelper.displayScrollableImage(image);
@@ -45,7 +45,7 @@ public class ImageHelper {
         return image;
     }
 
-    private Dimension prepareHeaderImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) throws Exception {
 
         int x = Dimensions.HEADER_FRAME_X.getVal();
         int w = Dimensions.HEADER_FRAME_W.getVal();
@@ -55,7 +55,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private Dimension prepareBarcodeImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) throws Exception {
 
         int x = Dimensions.BARCODE_FRAME_X.getVal();
         int w = Dimensions.BARCODE_FRAME_W.getVal();
@@ -65,7 +65,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private Dimension prepareTesseractImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) throws Exception {
 
         int x = Dimensions.TESSERACT_FRAME_X.getVal();
         int w = Dimensions.TESSERACT_FRAME_W.getVal();
@@ -75,23 +75,23 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private Dimension getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
+    private DimensionModel getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
         if (x + w > image.getWidth() && y + h > image.getHeight()) {
             log.warn("Aranan resim genişliği ve yüksekliği mevcut resimden daha büyük!");
-            return new Dimension(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
+            return new DimensionModel(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
         }
 
         if (x + w > image.getWidth()) {
             log.warn("Aranan resim genişliği mevcut resimden daha büyük!");
-            return new Dimension(x, y, Math.abs((image.getWidth() - x)), h);
+            return new DimensionModel(x, y, Math.abs((image.getWidth() - x)), h);
         }
 
         if (y + h > image.getHeight()) {
             log.warn("Aranan resim yükseklği mevcut resimden daha büyük!");
-            return new Dimension(x, y, w, Math.abs((image.getHeight() - y)));
+            return new DimensionModel(x, y, w, Math.abs((image.getHeight() - y)));
         }
 
-        return new Dimension(x, y, w, h);
+        return new DimensionModel(x, y, w, h);
     }
 
     public BufferedImage rotateImage(BufferedImage image, double degrees) {
@@ -115,7 +115,7 @@ public class ImageHelper {
     public BufferedImage readScannedImageGetBarcodePart(final boolean rotate) throws Exception {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        Dimension dim = prepareBarcodeImageDimensionBy(image);
+        DimensionModel dim = prepareBarcodeImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
         //imageHelper.displayScrollableImage(image);
@@ -126,7 +126,7 @@ public class ImageHelper {
     public BufferedImage readScannedImageGetTesseractPart(boolean rotate) throws Exception {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        Dimension dim = prepareTesseractImageDimensionBy(image);
+        DimensionModel dim = prepareTesseractImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
         //imageHelper.displayScrollableImage(image);

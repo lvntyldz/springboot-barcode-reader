@@ -4,11 +4,15 @@ import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/scanner")
 public class ScanController {
@@ -62,9 +66,9 @@ public class ScanController {
     public String scanAndReadByZebraCrossing() throws Exception {
 
         scannerService.scanFileFromScanner();
-        imageService.readBarcodeWithZXingFromScannedImage();
-
-        System.out.println("bitti!");
+        List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
+        log.info("result : {} ", datas);
+        log.debug("bitti");
 
         return "scan file and read barcode with Google Zebra Crossing API completed";
     }

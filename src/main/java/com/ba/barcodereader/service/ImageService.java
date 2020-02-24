@@ -4,6 +4,7 @@ package com.ba.barcodereader.service;
 import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
+import com.ba.barcodereader.model.BarcodeModel;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.util.ImageUtils;
 import com.google.cloud.vision.v1.*;
@@ -132,18 +133,21 @@ public class ImageService {
         detectText(Config.SCANNED_FILE_PATH, new PrintStream(Config.TEMP_DIR + "googleVisionOutput.txt"));//TODO:Development[name prepare method]
     }
 
-    public void readBarcodeWithZXingFromScannedImage() throws Exception {
+    public List<String> readBarcodeWithZXingFromScannedImage() throws Exception {
 
         BufferedImage image = imageHelper.readScannedImageGetBarcodePart(false);
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
-        searchWhiteFrameInMainImage(image);
+        BarcodeModel response = searchWhiteFrameInMainImage(image);
+        return response.getDataList();
     }
 
-    private void searchWhiteFrameInMainImage(BufferedImage image) throws IOException {
+    private BarcodeModel searchWhiteFrameInMainImage(BufferedImage image) throws IOException {
         int height = image.getHeight();
         int width = image.getWidth();
+        BarcodeModel response = new BarcodeModel();
 
+        outerloop:
         for (int y = 0; y < height; y = y + 5) {
             for (int x = 0; x < width; x = x + 5) {
 
@@ -152,12 +156,17 @@ public class ImageService {
                 }
 
                 BufferedImage subimage = image.getSubimage(x, y, Dimensions.SUB_IMAGE_DIMENSION.getVal(), Dimensions.SUB_IMAGE_DIMENSION.getVal());
-                checkWhiteFrameAndwriteToFile(x, y, subimage);
+                response = checkWhiteFrameAndwriteToFile(x, y, subimage);
+                if (response.isReadSuccessfully()) {
+                    break outerloop;
+                }
             }
         }
+
+        return response;
     }
 
-    private void checkWhiteFrameAndwriteToFile(int x, int y, BufferedImage subimage) throws IOException {
+    private BarcodeModel checkWhiteFrameAndwriteToFile(int x, int y, BufferedImage subimage) throws IOException {
 
         boolean isHasWhiteFrame = true;
         int subimageHeight = subimage.getHeight();
@@ -173,24 +182,33 @@ public class ImageService {
             }
         }
 
+        BarcodeModel response = new BarcodeModel();
+
         if (isHasWhiteFrame) {
             //imageHelper.displayScrollableImage(subimage);
             String subImagePath = fileHelper.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
-            tryReadDataMatrix(subImagePath);
+            response = tryReadDataMatrix(subImagePath);
         }
+
+        return response;
+
     }
 
-    private void tryReadDataMatrix(String filePath) {
-
-        Map<DecodeHintType, Object> hintsMap;
+    private BarcodeModel tryReadDataMatrix(String filePath) {
+        BarcodeModel response = new BarcodeModel();
         BufferedImage before = null;
+        Map<DecodeHintType, Object> hintsMap;
         hintsMap = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
         hintsMap.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
         hintsMap.put(DecodeHintType.POSSIBLE_FORMATS, EnumSet.allOf(BarcodeFormat.class));
 
         try {
             before = ImageIO.read(new File(filePath));
-            decode(before);
+            response = decode(before);
+            if (response.isReadSuccessfully()) {
+                return response;
+            }
+
             for (int i = -100; i < 100; i++) {
                 AffineTransform transform = new AffineTransform();
                 double rad = (double) i / 100;
@@ -201,35 +219,44 @@ public class ImageService {
                 BufferedImage after = new BufferedImage(before.getWidth(), before.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
                 after = op.filter(before, after);
-                decode(after);
+                response = decode(after);
+                if (response.isReadSuccessfully()) {
+                    break;
+                }
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return response;
     }
 
-    public static void decode(BufferedImage tmpBfrImage) {
+    public static BarcodeModel decode(BufferedImage tmpBfrImage) {
         if (tmpBfrImage == null)
             throw new IllegalArgumentException("Could not decode image.");
+
         LuminanceSource tmpSource = new BufferedImageLuminanceSource(tmpBfrImage);
         BinaryBitmap tmpBitmap = new BinaryBitmap(new HybridBinarizer(tmpSource));
         MultiFormatReader tmpBarcodeReader = new MultiFormatReader();
 
         Result tmpResult;
         String tmpFinalResult;
+        BarcodeModel barcodeModel = new BarcodeModel();
+
         try {
-            if (hintsMap != null && !hintsMap.isEmpty())
+            if (hintsMap != null && !hintsMap.isEmpty()) {
                 tmpResult = tmpBarcodeReader.decode(tmpBitmap, hintsMap);
-            else
+            } else {
                 tmpResult = tmpBarcodeReader.decode(tmpBitmap);
+            }
+
             // setting results.
             tmpFinalResult = String.valueOf(tmpResult.getText());
-            System.out.println(tmpFinalResult);
-            System.exit(0);
-            ;
+            barcodeModel = new BarcodeModel(true, Arrays.asList(tmpFinalResult));
         } catch (Exception tmpExcpt) {
             tmpExcpt.printStackTrace();
         }
+
+        return barcodeModel;
     }
 }
