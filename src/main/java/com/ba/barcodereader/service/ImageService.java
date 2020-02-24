@@ -20,7 +20,31 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
+
+import com.google.api.Page;
+import com.google.api.gax.longrunning.OperationFuture;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.vision.v1.*;
+import com.google.cloud.vision.v1.Feature.Type;
+import com.google.common.collect.Lists;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.util.JsonFormat;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 @Service
 public class ImageService {
@@ -85,6 +109,50 @@ public class ImageService {
         Tesseract tesseract = new Tesseract();
         tesseract.setDatapath(Config.DATA_FOLDER);
         return tesseract.doOCR(subimage);
+    }
+
+
+    private  void detectText(String filePath, PrintStream out) throws Exception, IOException {
+        List<AnnotateImageRequest> requests = new ArrayList<>();
+
+        ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+
+        Image img = Image.newBuilder().setContent(imgBytes).build();
+        Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
+        AnnotateImageRequest request =
+                AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
+        requests.add(request);
+
+        try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
+            BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
+            List<AnnotateImageResponse> responses = response.getResponsesList();
+
+            for (AnnotateImageResponse res : responses) {
+                if (res.hasError()) {
+                    out.printf("Error: %s\n", res.getError().getMessage());
+                    return;
+                }
+
+                // For full list of available annotations, see http://g.co/cloud/vision/docs
+                for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
+                    out.printf("Text: %s\n", annotation.getDescription());
+                    out.printf("Position : %s\n", annotation.getBoundingPoly());
+                }
+            }
+        }
+    }
+
+
+    public void readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
+        BufferedImage image = imageHelper.readScannedImageGetBarcodePart();
+
+        fileHelper.writeToTargetAsJpg(image, "croppedImage");
+        //searchWhiteFrameInMainImage(image);
+
+        String filePath = "/Users/leventyildiz/development/git/springboot-barcode-reader/img000001.jpg";
+
+
+        detectText(filePath, new PrintStream(filePath+".txt"));
     }
 
     public void readBarcodeWithZXingFromScannedImage() throws Exception {
