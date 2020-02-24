@@ -51,7 +51,7 @@ public class ScanController {
     @RequestMapping("/scan-file/gv")
     public String scanAndReadByGoogleVision() throws Exception {
 
-        //scannerService.scanFileFromScanner();
+        scannerService.scanFileFromScanner();
         imageService.readBarcodeWithGoogleVisionFromScannedImage();
 
         return "scan file and read barcode with Google Vision Api completed";

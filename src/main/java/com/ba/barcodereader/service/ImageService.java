@@ -6,6 +6,8 @@ import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.util.ImageUtils;
+import com.google.cloud.vision.v1.*;
+import com.google.protobuf.ByteString;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
@@ -19,31 +21,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
-
-import com.google.api.Page;
-import com.google.api.gax.longrunning.OperationFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.vision.v1.*;
-import com.google.cloud.vision.v1.Feature.Type;
-import com.google.common.collect.Lists;
-import com.google.protobuf.ByteString;
-import com.google.protobuf.util.JsonFormat;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 @Service
@@ -112,7 +93,7 @@ public class ImageService {
     }
 
 
-    private  void detectText(String filePath, PrintStream out) throws Exception, IOException {
+    private void detectText(String filePath, PrintStream out) throws Exception, IOException {
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
@@ -149,10 +130,7 @@ public class ImageService {
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
         //searchWhiteFrameInMainImage(image);
 
-        String filePath = "/Users/leventyildiz/development/git/springboot-barcode-reader/img000001.jpg";
-
-
-        detectText(filePath, new PrintStream(filePath+".txt"));
+        detectText(Config.SCANNED_FILE_PATH, new PrintStream(Config.TEMP_DIR + "googleVisionOutput.txt"));//TODO:Development[name prepare method]
     }
 
     public void readBarcodeWithZXingFromScannedImage() throws Exception {
