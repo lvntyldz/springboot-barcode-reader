@@ -37,8 +37,6 @@ public class ImageService {
     @Autowired
     FileHelper fileHelper;
 
-    private static Map<DecodeHintType, Object> hintsMap;
-
     public void readBarcodeWithTesseractFromScannedImageVia() throws Exception {
         BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
@@ -204,7 +202,7 @@ public class ImageService {
 
         try {
             before = ImageIO.read(new File(filePath));
-            response = decode(before);
+            response = decode(before, hintsMap);
             if (response.isReadSuccessfully()) {
                 return response;
             }
@@ -219,7 +217,7 @@ public class ImageService {
                 BufferedImage after = new BufferedImage(before.getWidth(), before.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
                 after = op.filter(before, after);
-                response = decode(after);
+                response = decode(after, hintsMap);
                 if (response.isReadSuccessfully()) {
                     break;
                 }
@@ -231,7 +229,7 @@ public class ImageService {
         return response;
     }
 
-    public static BarcodeModel decode(BufferedImage tmpBfrImage) {
+    public static BarcodeModel decode(BufferedImage tmpBfrImage, Map<DecodeHintType, Object> hintsMap) {
         if (tmpBfrImage == null)
             throw new IllegalArgumentException("Could not decode image.");
 

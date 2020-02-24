@@ -68,7 +68,6 @@ public class ScanController {
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
         log.info("result : {} ", datas);
-        log.debug("bitti");
 
         return "scan file and read barcode with Google Zebra Crossing API completed";
     }
