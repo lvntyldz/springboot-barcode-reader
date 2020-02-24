@@ -36,7 +36,7 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file")
-    public String scanFile() {
+    public String scanFile() throws InterruptedException {
         scannerService.scanFileFromScanner();
         return "scan file completed";
     }
