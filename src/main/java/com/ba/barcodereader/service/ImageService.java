@@ -125,7 +125,7 @@ public class ImageService {
 
 
     public void readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
-        BufferedImage image = imageHelper.readScannedImageGetBarcodePart();
+        BufferedImage image = imageHelper.readScannedImageGetHeaderPart();
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
         //searchWhiteFrameInMainImage(image);

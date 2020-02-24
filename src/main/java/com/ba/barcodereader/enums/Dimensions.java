@@ -14,6 +14,12 @@ public enum Dimensions {
     TESSERACT_FRAME_W(1200),
     TESSERACT_FRAME_H(300),
 
+    //header frame dimensions
+    HEADER_FRAME_X(0),
+    HEADER_FRAME_Y(0),
+    HEADER_FRAME_W(1600),
+    HEADER_FRAME_H(300),
+
     //image dimensions
     RGB_WHITE_THRESHOLD(230),//230-255 arası beyaz kabul edilir
     SUB_IMAGE_DIMENSION(180),//180px genişliğinde beyaz kare aranır resimde

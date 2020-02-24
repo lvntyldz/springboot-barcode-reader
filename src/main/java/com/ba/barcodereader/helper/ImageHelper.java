@@ -53,6 +53,22 @@ public class ImageHelper {
         return image;
     }
 
+    public BufferedImage readScannedImageGetHeaderPart() throws Exception {
+        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+        fileHelper.writeToTargetAsJpg(image, "originalImage");
+
+        //image = rotateImage(image, 90);
+        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+
+        if (Dimensions.HEADER_FRAME_X.getVal() + Dimensions.HEADER_FRAME_W.getVal() > image.getWidth() || Dimensions.HEADER_FRAME_Y.getVal() + Dimensions.HEADER_FRAME_H.getVal() > image.getHeight()) {
+            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
+        }
+
+        image = image.getSubimage(Dimensions.HEADER_FRAME_X.getVal(), Dimensions.HEADER_FRAME_Y.getVal(), Dimensions.HEADER_FRAME_W.getVal(), Dimensions.HEADER_FRAME_H.getVal());
+        //imageHelper.displayScrollableImage(image);
+        return image;
+    }
+
     public BufferedImage readScannedImageGetTesseractPart() throws Exception {
         BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
         fileHelper.writeToTargetAsJpg(image, "originalImage");
