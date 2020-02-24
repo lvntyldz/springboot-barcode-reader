@@ -39,7 +39,7 @@ public class ImageService {
     private static Map<DecodeHintType, Object> hintsMap;
 
     public void readBarcodeWithTesseractFromScannedImageVia() throws Exception {
-        BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart();
+        BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
         fileHelper.writeToTargetAsJpg(subimage, "croppedImage");
         //searchWhiteFrameInMainImage(image);
@@ -125,16 +125,16 @@ public class ImageService {
 
 
     public void readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
-        BufferedImage image = imageHelper.readScannedImageGetHeaderPart();
+        BufferedImage image = imageHelper.readScannedImageGetHeaderPart(false);
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
-        //searchWhiteFrameInMainImage(image);
 
         detectText(Config.SCANNED_FILE_PATH, new PrintStream(Config.TEMP_DIR + "googleVisionOutput.txt"));//TODO:Development[name prepare method]
     }
 
     public void readBarcodeWithZXingFromScannedImage() throws Exception {
-        BufferedImage image = imageHelper.readScannedImageGetBarcodePart();
+
+        BufferedImage image = imageHelper.readScannedImageGetBarcodePart(false);
 
         fileHelper.writeToTargetAsJpg(image, "croppedImage");
         searchWhiteFrameInMainImage(image);

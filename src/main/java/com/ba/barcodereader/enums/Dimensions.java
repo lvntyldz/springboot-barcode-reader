@@ -3,13 +3,13 @@ package com.ba.barcodereader.enums;
 public enum Dimensions {
 
     //barcode frame dimensions
-    BARCODE_FRAME_X(0),
-    BARCODE_FRAME_Y(400),
-    BARCODE_FRAME_W(300),
-    BARCODE_FRAME_H(1200),
+    BARCODE_FRAME_X(600),
+    BARCODE_FRAME_Y(0),
+    BARCODE_FRAME_W(1200),
+    BARCODE_FRAME_H(300),
 
     //tesseract frame dimensions
-    TESSERACT_FRAME_X(2000),
+    TESSERACT_FRAME_X(400),
     TESSERACT_FRAME_Y(0),
     TESSERACT_FRAME_W(1200),
     TESSERACT_FRAME_H(300),
@@ -17,7 +17,7 @@ public enum Dimensions {
     //header frame dimensions
     HEADER_FRAME_X(0),
     HEADER_FRAME_Y(0),
-    HEADER_FRAME_W(1600),
+    HEADER_FRAME_W(11600),
     HEADER_FRAME_H(300),
 
     //image dimensions

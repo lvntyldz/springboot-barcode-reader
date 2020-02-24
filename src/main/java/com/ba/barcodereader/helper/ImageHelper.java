@@ -1,7 +1,9 @@
 package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.enums.Dimensions;
+import com.ba.barcodereader.model.Dimension;
 import com.ba.barcodereader.props.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,12 +14,85 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 @Component
+@Slf4j
 public class ImageHelper {
 
     @Autowired
     FileHelper fileHelper;
+
+    public BufferedImage readScannedImageGetHeaderPart(final boolean rotate) throws Exception {
+
+        BufferedImage image = getReadAndRotateImage(rotate);
+        Dimension dim = prepareHeaderImageDimensionBy(image);
+
+        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+        //imageHelper.displayScrollableImage(image);
+
+        return image;
+    }
+
+    private BufferedImage getReadAndRotateImage(boolean rotate) throws IOException {
+        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+        fileHelper.writeToTargetAsJpg(image, "originalImage");
+
+        if (rotate) {
+            image = rotateImage(image, 90);
+            fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+        }
+        return image;
+    }
+
+    private Dimension prepareHeaderImageDimensionBy(BufferedImage image) throws Exception {
+
+        int x = Dimensions.HEADER_FRAME_X.getVal();
+        int w = Dimensions.HEADER_FRAME_W.getVal();
+        int y = Dimensions.HEADER_FRAME_Y.getVal();
+        int h = Dimensions.HEADER_FRAME_H.getVal();
+
+        return getImageDimensionBy(image, x, w, y, h);
+    }
+
+    private Dimension prepareBarcodeImageDimensionBy(BufferedImage image) throws Exception {
+
+        int x = Dimensions.BARCODE_FRAME_X.getVal();
+        int w = Dimensions.BARCODE_FRAME_W.getVal();
+        int y = Dimensions.BARCODE_FRAME_Y.getVal();
+        int h = Dimensions.BARCODE_FRAME_H.getVal();
+
+        return getImageDimensionBy(image, x, w, y, h);
+    }
+
+    private Dimension prepareTesseractImageDimensionBy(BufferedImage image) throws Exception {
+
+        int x = Dimensions.TESSERACT_FRAME_X.getVal();
+        int w = Dimensions.TESSERACT_FRAME_W.getVal();
+        int y = Dimensions.TESSERACT_FRAME_Y.getVal();
+        int h = Dimensions.TESSERACT_FRAME_H.getVal();
+
+        return getImageDimensionBy(image, x, w, y, h);
+    }
+
+    private Dimension getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
+        if (x + w > image.getWidth() && y + h > image.getHeight()) {
+            log.warn("Aranan resim genişliği ve yüksekliği mevcut resimden daha büyük!");
+            return new Dimension(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
+        }
+
+        if (x + w > image.getWidth()) {
+            log.warn("Aranan resim genişliği mevcut resimden daha büyük!");
+            return new Dimension(x, y, Math.abs((image.getWidth() - x)), h);
+        }
+
+        if (y + h > image.getHeight()) {
+            log.warn("Aranan resim yükseklği mevcut resimden daha büyük!");
+            return new Dimension(x, y, w, Math.abs((image.getHeight() - y)));
+        }
+
+        return new Dimension(x, y, w, h);
+    }
 
     public BufferedImage rotateImage(BufferedImage image, double degrees) {
 
@@ -37,51 +112,25 @@ public class ImageHelper {
         return finalBufferedImage;
     }
 
-    public BufferedImage readScannedImageGetBarcodePart() throws Exception {
-        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-        fileHelper.writeToTargetAsJpg(image, "originalImage");
+    public BufferedImage readScannedImageGetBarcodePart(final boolean rotate) throws Exception {
 
-        //image = rotateImage(image, 90);
-        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+        BufferedImage image = getReadAndRotateImage(rotate);
+        Dimension dim = prepareBarcodeImageDimensionBy(image);
 
-        if (Dimensions.BARCODE_FRAME_X.getVal() + Dimensions.BARCODE_FRAME_W.getVal() > image.getWidth() || Dimensions.BARCODE_FRAME_Y.getVal() + Dimensions.BARCODE_FRAME_H.getVal() > image.getHeight()) {
-            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
-        }
-
-        image = image.getSubimage(Dimensions.BARCODE_FRAME_X.getVal(), Dimensions.BARCODE_FRAME_Y.getVal(), Dimensions.BARCODE_FRAME_W.getVal(), Dimensions.BARCODE_FRAME_H.getVal());
+        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
         //imageHelper.displayScrollableImage(image);
+
         return image;
     }
 
-    public BufferedImage readScannedImageGetHeaderPart() throws Exception {
-        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-        fileHelper.writeToTargetAsJpg(image, "originalImage");
+    public BufferedImage readScannedImageGetTesseractPart(boolean rotate) throws Exception {
 
-        //image = rotateImage(image, 90);
-        //fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+        BufferedImage image = getReadAndRotateImage(rotate);
+        Dimension dim = prepareTesseractImageDimensionBy(image);
 
-        if (Dimensions.HEADER_FRAME_X.getVal() + Dimensions.HEADER_FRAME_W.getVal() > image.getWidth() || Dimensions.HEADER_FRAME_Y.getVal() + Dimensions.HEADER_FRAME_H.getVal() > image.getHeight()) {
-            throw new Exception("Aranacak barcode ölçüleri resimden daha büyük!");//TODO
-        }
-
-        image = image.getSubimage(Dimensions.HEADER_FRAME_X.getVal(), Dimensions.HEADER_FRAME_Y.getVal(), Dimensions.HEADER_FRAME_W.getVal(), Dimensions.HEADER_FRAME_H.getVal());
+        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
         //imageHelper.displayScrollableImage(image);
-        return image;
-    }
 
-    public BufferedImage readScannedImageGetTesseractPart() throws Exception {
-        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-        fileHelper.writeToTargetAsJpg(image, "originalImage");
-
-        image = rotateImage(image, 90);
-        fileHelper.writeToTargetAsJpg(image, "rotatedImage");
-
-        if (Dimensions.TESSERACT_FRAME_X.getVal() + Dimensions.TESSERACT_FRAME_W.getVal() > image.getWidth() || Dimensions.TESSERACT_FRAME_Y.getVal() + Dimensions.TESSERACT_FRAME_H.getVal() > image.getHeight()) {
-            throw new Exception("Aranacak TESSERACT ölçüleri resimden daha büyük!");//TODO
-        }
-
-        image = image.getSubimage(Dimensions.TESSERACT_FRAME_X.getVal(), Dimensions.TESSERACT_FRAME_Y.getVal(), Dimensions.TESSERACT_FRAME_W.getVal(), Dimensions.TESSERACT_FRAME_H.getVal());
-        //imageHelper.displayScrollableImage(image);
         return image;
     }
 
