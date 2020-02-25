@@ -17,7 +17,17 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @ExceptionHandler(SystemException.class)
     public final ResponseEntity<ErrorResponseModel> handleSystemException(SystemException e, WebRequest request) {
-        ErrorResponseModel response = new ErrorResponseModel(new Date(), e.getMessage(), request.getDescription(false));
+        ErrorResponseModel response = prepareResponseModel(e.getMessage(), request);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ErrorResponseModel prepareResponseModel(String message, WebRequest request) {
+        return new ErrorResponseModel(new Date(), message, request.getDescription(false));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<ErrorResponseModel> handlerException(Exception e, WebRequest request) {
+        ErrorResponseModel response = prepareResponseModel(e.getMessage(), request);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
