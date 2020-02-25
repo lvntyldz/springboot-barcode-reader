@@ -40,16 +40,26 @@ public class ImageService {
     @Autowired
     FileHelper fileHelper;
 
-    public void readBarcodeWithTesseractFromScannedImageVia() throws Exception {
+    public List<String> readBarcodeWithTesseractFromScannedImageVia() throws Exception {
         BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
         fileHelper.writeToTempAsJpg(subimage, Config.CROP_IMG_NAME);
         //searchWhiteFrameInMainImage(image);
         imageToBlackWhite(subimage);
 
+        fileHelper.writeToTempAsJpg(subimage, "blackWhiteImage");
+
         String text = getStringFromImage(subimage);
-        List<String> data = getFinalDatas(text);
-        log.info("Final Data : {}", data);
+        String actualData = findCartNumberWithRegex(text);
+        log.info("Final Actual Data : {}", actualData);
+        if (actualData != null) {
+            return Arrays.asList(actualData);
+        }
+
+        List<String> datas = getFinalDatas(text);
+        log.info("Final datas : {}", datas);
+
+        return datas;
     }
 
     private static void imageToBlackWhite(BufferedImage subimage) {

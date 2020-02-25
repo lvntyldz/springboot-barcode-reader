@@ -4,7 +4,6 @@ import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,12 +44,15 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file/t")
-    public String scanAndReadByTesseract() throws Exception {
+    @ResponseBody
+    public List<String> scanAndReadByTesseract() throws Exception {
 
         scannerService.scanFileFromScanner();
-        imageService.readBarcodeWithTesseractFromScannedImageVia();
+        List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
 
-        return "scan file and read barcode with tesseract completed";
+        log.info("result : {} ", datas);
+
+        return datas;
     }
 
     @GetMapping

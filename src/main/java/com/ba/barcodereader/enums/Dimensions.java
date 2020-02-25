@@ -27,7 +27,7 @@ public enum Dimensions {
     //for tesseract
     WHITE_COLOR(16777215),
     BLACK_COLOR(0),
-    RGB_THRESHOLD(120);
+    RGB_THRESHOLD(150);
 
     private int val;
 
