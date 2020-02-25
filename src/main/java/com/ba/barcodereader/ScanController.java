@@ -2,15 +2,20 @@ package com.ba.barcodereader;
 
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
+import com.ba.barcodereader.model.ResponseModel;
+import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -39,37 +44,42 @@ public class ScanController {
 
     @GetMapping("/scan-file/t")
     @ResponseBody
-    public List<String> scanAndReadByTesseract() {
+    public ResponseEntity<ResponseModel> scanAndReadByTesseract() {
 
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
 
         log.info("scan-file/t result : {} ", datas);
 
-        return datas;
+        return prepareResponseEntity(datas);
     }
 
     @GetMapping("/scan-file/gv")
     @ResponseBody
-    public List<String> scanAndReadByGoogleVision() {
+    public ResponseEntity<ResponseModel> scanAndReadByGoogleVision() {
 
         scannerService.scanFileFromScanner();
 
         List<String> datas = imageService.readBarcodeWithGoogleVisionFromScannedImage();
         log.info("scan-file/gv result : {} ", datas);
 
-        return datas;
+        return prepareResponseEntity(datas);
     }
 
     @GetMapping("/scan-file/zx")
     @ResponseBody
-    public List<String> scanAndReadByZebraCrossing() {
+    public ResponseEntity<ResponseModel> scanAndReadByZebraCrossing() {
 
         scannerService.scanFileFromScanner();
 
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
         log.info("scan-file/zx result : {} ", datas);
 
-        return datas;
+        return prepareResponseEntity(datas);
+    }
+
+    private ResponseEntity<ResponseModel> prepareResponseEntity(List<String> datas) {
+        ResponseModel response = new ResponseModel(datas, Arrays.asList(Config.SCANNED_FILE_PATH));
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 }
