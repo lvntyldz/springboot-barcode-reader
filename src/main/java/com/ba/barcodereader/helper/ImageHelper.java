@@ -5,26 +5,39 @@ import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.model.DimensionModel;
 import com.ba.barcodereader.props.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@Component
 @Slf4j
 public class ImageHelper {
 
-    @Autowired
-    FileHelper fileHelper;
+    public static void convertToBlackWhite(BufferedImage subimage) {
+        for (int xx = 0; xx < subimage.getWidth(); xx++) {
+            for (int yy = 0; yy < subimage.getHeight(); yy++) {
 
-    public BufferedImage readScannedImageGetHeaderPart(final boolean rotate) {
+                int clr = subimage.getRGB(xx, yy);
+                int red = (clr & 0x00ff0000) >> 16;
+                int green = (clr & 0x0000ff00) >> 8;
+                int blue = clr & 0x000000ff;
+
+                if (red > Dimensions.RGB_THRESHOLD.getVal() && green > Dimensions.RGB_THRESHOLD.getVal() && blue > Dimensions.RGB_THRESHOLD.getVal()) {
+                    subimage.setRGB(xx, yy, Dimensions.WHITE_COLOR.getVal());
+                    continue;
+                }
+                subimage.setRGB(xx, yy, Dimensions.BLACK_COLOR.getVal());
+            }
+        }
+
+        FileHelper.writeToTempAsJpg(subimage, "blackWhiteImage");
+    }
+
+    public static BufferedImage readScannedImageGetHeaderPart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareHeaderImageDimensionBy(image);
@@ -34,16 +47,16 @@ public class ImageHelper {
         return image;
     }
 
-    private BufferedImage getReadAndRotateImage(boolean rotate) {
+    private static BufferedImage getReadAndRotateImage(boolean rotate) {
         BufferedImage image = null;
 
         try {
             image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-            fileHelper.writeToTempAsJpg(image, "originalImage");
+            FileHelper.writeToTempAsJpg(image, "originalImage");
 
             if (rotate) {
                 image = rotateImage(image, 90);
-                fileHelper.writeToTempAsJpg(image, "rotatedImage");
+                FileHelper.writeToTempAsJpg(image, "rotatedImage");
             }
         } catch (IOException e) {
             log.error("File could not not read! e:{} ", e);
@@ -52,7 +65,7 @@ public class ImageHelper {
         return image;
     }
 
-    private DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) {
+    private static DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.HEADER_FRAME_X.getVal();
         int w = Dimensions.HEADER_FRAME_W.getVal();
@@ -62,7 +75,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) {
+    private static DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.BARCODE_FRAME_X.getVal();
         int w = Dimensions.BARCODE_FRAME_W.getVal();
@@ -72,7 +85,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) {
+    private static DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.TESSERACT_FRAME_X.getVal();
         int w = Dimensions.TESSERACT_FRAME_W.getVal();
@@ -82,7 +95,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private DimensionModel getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
+    private static DimensionModel getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
         if (x + w > image.getWidth() && y + h > image.getHeight()) {
             log.warn("Aranan resim genişliği ve yüksekliği mevcut resimden daha büyük!");
             return new DimensionModel(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
@@ -101,7 +114,7 @@ public class ImageHelper {
         return new DimensionModel(x, y, w, h);
     }
 
-    public BufferedImage rotateImage(BufferedImage image, double degrees) {
+    private static BufferedImage rotateImage(BufferedImage image, double degrees) {
 
         final double rads = Math.toRadians(90);
         final double sin = Math.abs(Math.sin(rads));
@@ -119,7 +132,7 @@ public class ImageHelper {
         return finalBufferedImage;
     }
 
-    public BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
+    public static BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareBarcodeImageDimensionBy(image);
@@ -130,12 +143,14 @@ public class ImageHelper {
         return image;
     }
 
-    public BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
+    public static BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareTesseractImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
         return image;
     }
@@ -150,13 +165,4 @@ public class ImageHelper {
         frame.setVisible(true);
     }
 
-    public void displayImage(BufferedImage image) {
-
-        JFrame frame = new JFrame();
-        frame.getContentPane().setLayout(new FlowLayout());
-        frame.getContentPane().add(new JLabel(new ImageIcon(image)));
-        frame.pack();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
 }

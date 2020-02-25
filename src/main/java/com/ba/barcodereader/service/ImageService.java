@@ -5,6 +5,8 @@ import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
+import com.ba.barcodereader.helper.RegexHelper;
+import com.ba.barcodereader.helper.TesseractHelper;
 import com.ba.barcodereader.model.BarcodeModel;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.util.ImageUtils;
@@ -14,8 +16,6 @@ import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import lombok.extern.slf4j.Slf4j;
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,101 +27,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 @Service
 @Slf4j
 public class ImageService {
 
-    @Autowired
-    ImageHelper imageHelper;
-
-    @Autowired
-    FileHelper fileHelper;
-
     public List<String> readBarcodeWithTesseractFromScannedImageVia() {
-        BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
+        BufferedImage subimage = ImageHelper.readScannedImageGetTesseractPart(false);
+        ImageHelper.convertToBlackWhite(subimage);
 
-        fileHelper.writeToTempAsJpg(subimage, Config.CROP_IMG_NAME);
-        imageToBlackWhite(subimage);
-
-        fileHelper.writeToTempAsJpg(subimage, "blackWhiteImage");
-
-        String text = getStringFromImage(subimage);
-        String actualData = findCartNumberWithRegex(text);
+        String text = TesseractHelper.getTextFromImage(subimage);
+        String actualData = RegexHelper.findCartNumberWithRegex(text);
         log.info("Final Actual Data : {}", actualData);
+
         if (actualData != null) {
             return Arrays.asList(actualData);
         }
 
-        List<String> datas = getFinalDatas(text);
+        List<String> datas = TesseractHelper.getFinalDataByLength(text);
         log.info("Final datas : {}", datas);
 
         return datas;
     }
-
-    private static void imageToBlackWhite(BufferedImage subimage) {
-        for (int xx = 0; xx < subimage.getWidth(); xx++) {
-            for (int yy = 0; yy < subimage.getHeight(); yy++) {
-
-                int clr = subimage.getRGB(xx, yy);
-                int red = (clr & 0x00ff0000) >> 16;
-                int green = (clr & 0x0000ff00) >> 8;
-                int blue = clr & 0x000000ff;
-
-                if (red > Dimensions.RGB_THRESHOLD.getVal() && green > Dimensions.RGB_THRESHOLD.getVal() && blue > Dimensions.RGB_THRESHOLD.getVal()) {
-                    subimage.setRGB(xx, yy, Dimensions.WHITE_COLOR.getVal());
-                    continue;
-                }
-                subimage.setRGB(xx, yy, Dimensions.BLACK_COLOR.getVal());
-            }
-        }
-    }
-
-    private static String findCartNumberWithRegex(String stringToSearch) {
-
-        final String regexPattern = "((\\d){1}(R)(\\d){11})";
-
-        // create a pattern
-        Pattern pattern = Pattern.compile(regexPattern);
-
-        // get a matcher object
-        Matcher matcher = pattern.matcher(stringToSearch);
-
-        return (matcher.find()) ? (matcher.toMatchResult().group(1)) : (null);
-    }
-
-    private static List<String> getFinalDatas(String text) {
-        List<String> data = new ArrayList<>();
-
-        String[] datasByNewLine = text.split("\n");
-
-        for (String row : datasByNewLine) {
-            String[] allData = row.split(" ");
-            for (String s : allData) {
-                s = s.replaceAll("\\D+", "");//remmove nonDigitData
-                if (s.length() == 11 || s.length() == 12 || s.length() == 13) {
-                    data.add(s);
-                }
-            }
-        }
-
-        return data;
-    }
-
-    private String getStringFromImage(BufferedImage subimage) {
-        Tesseract tesseract = new Tesseract();
-        tesseract.setDatapath(Config.DATA_FOLDER);
-        try {
-            return tesseract.doOCR(subimage);
-        } catch (TesseractException e) {
-            log.error("OCR not read image as text! e : {} ", e);
-            throw new SystemException("Could not read text!");
-        }
-    }
-
 
     private String detectAllTextFromGivenImage(String filePath) {
 
@@ -169,15 +97,14 @@ public class ImageService {
         return stringBuilder.toString();
     }
 
-
     public List<String> readBarcodeWithGoogleVisionFromScannedImage() {
-        BufferedImage image = imageHelper.readScannedImageGetHeaderPart(false);
+        BufferedImage image = ImageHelper.readScannedImageGetHeaderPart(false);
 
-        fileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
-        String imageTexts = detectAllTextFromGivenImage(fileHelper.getCroppedImgPath());
+        String imageTexts = detectAllTextFromGivenImage(FileHelper.getCroppedImgPath());
 
-        String cardNumber = findCartNumberWithRegex(imageTexts);
+        String cardNumber = RegexHelper.findCartNumberWithRegex(imageTexts);
 
         log.info("Final data : {} ", cardNumber);
 
@@ -186,9 +113,9 @@ public class ImageService {
 
     public List<String> readBarcodeWithZXingFromScannedImage() {
 
-        BufferedImage image = imageHelper.readScannedImageGetBarcodePart(false);
+        BufferedImage image = ImageHelper.readScannedImageGetBarcodePart(false);
 
-        fileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
         BarcodeModel response = searchWhiteFrameInMainImage(image);
         return response.getDataList();
     }
@@ -236,7 +163,7 @@ public class ImageService {
         BarcodeModel response = new BarcodeModel();
 
         if (isHasWhiteFrame) {
-            String subImagePath = fileHelper.writeToTempAsJpg(subimage, Config.WHITE_FRAME_IMG_NAME);
+            String subImagePath = FileHelper.writeToTempAsJpg(subimage, Config.WHITE_FRAME_IMG_NAME);
             response = tryReadDataMatrix(subImagePath);
         }
 

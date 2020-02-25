@@ -29,12 +29,6 @@ public class ScanController {
     @Autowired
     ImageService imageService;
 
-    @Autowired
-    ImageHelper imageHelper;
-
-    @Autowired
-    FileHelper fileHelper;
-
     @GetMapping
     @RequestMapping("/scan-file")
     public String scanFile() {
@@ -48,8 +42,6 @@ public class ScanController {
 
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
-
-        log.info("scan-file/t result : {} ", datas);
 
         return prepareResponseEntity(datas);
     }

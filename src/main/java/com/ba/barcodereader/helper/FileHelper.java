@@ -2,6 +2,7 @@ package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.props.Config;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -9,13 +10,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-@Component
+@Slf4j
 public class FileHelper {
 
     private static final String JPG_EX = "jpg";
     private static final String JPG_FULL_EX = ".jpg";
 
-    public String writeToTempAsJpg(BufferedImage image, String name) {
+    public static String writeToTempAsJpg(BufferedImage image, String name) {
         String outputFilePath = getFullOutputFilePath(name);
         File output = new File(outputFilePath);
         try {
@@ -26,15 +27,12 @@ public class FileHelper {
         return outputFilePath;
     }
 
-    private String getFullOutputFilePath(String name) {
+    private static String getFullOutputFilePath(String name) {
         return Config.TEMP_DIR + name + JPG_FULL_EX;
     }
 
-    public String getCroppedImgPath() {
+    public static String getCroppedImgPath() {
         return getFullOutputFilePath(Config.CROP_IMG_NAME);
     }
 
-    public String getWhiteFrameImgPath() {
-        return getFullOutputFilePath(Config.WHITE_FRAME_IMG_NAME);
-    }
 }
