@@ -29,12 +29,7 @@ public class ScanController {
 
     @Autowired
     FileHelper fileHelper;
-
-    @GetMapping
-    public String hello() {
-        return "Hello World.";
-    }
-
+    
     @GetMapping
     @RequestMapping("/scan-file")
     public String scanFile() throws InterruptedException {
