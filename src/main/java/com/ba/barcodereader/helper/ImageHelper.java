@@ -38,7 +38,7 @@ public class ImageHelper {
         BufferedImage image = null;
 
         try {
-            ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+            image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
             fileHelper.writeToTempAsJpg(image, "originalImage");
 
             if (rotate) {
