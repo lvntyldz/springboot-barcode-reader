@@ -36,11 +36,11 @@ public class ImageHelper {
 
     private BufferedImage getReadAndRotateImage(boolean rotate) throws IOException {
         BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-        fileHelper.writeToTargetAsJpg(image, "originalImage");
+        fileHelper.writeToTempAsJpg(image, "originalImage");
 
         if (rotate) {
             image = rotateImage(image, 90);
-            fileHelper.writeToTargetAsJpg(image, "rotatedImage");
+            fileHelper.writeToTempAsJpg(image, "rotatedImage");
         }
         return image;
     }

@@ -55,12 +55,15 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file/gv")
-    public String scanAndReadByGoogleVision() throws Exception {
+    @ResponseBody
+    public List<String> scanAndReadByGoogleVision() throws Exception {
 
         scannerService.scanFileFromScanner();
-        imageService.readBarcodeWithGoogleVisionFromScannedImage();
 
-        return "scan file and read barcode with Google Vision Api completed";
+        List<String> datas = imageService.readBarcodeWithGoogleVisionFromScannedImage();
+        log.info("result : {} ", datas);
+
+        return datas;
     }
 
     @GetMapping
@@ -69,6 +72,7 @@ public class ScanController {
     public List<String> scanAndReadByZebraCrossing() throws Exception {
 
         scannerService.scanFileFromScanner();
+
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
         log.info("result : {} ", datas);
 

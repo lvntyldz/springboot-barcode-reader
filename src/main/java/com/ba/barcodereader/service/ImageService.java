@@ -25,8 +25,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -42,7 +43,7 @@ public class ImageService {
     public void readBarcodeWithTesseractFromScannedImageVia() throws Exception {
         BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
-        fileHelper.writeToTargetAsJpg(subimage, "croppedImage");
+        fileHelper.writeToTempAsJpg(subimage, Config.CROP_IMG_NAME);
         //searchWhiteFrameInMainImage(image);
         imageToBlackWhite(subimage);
 
@@ -67,6 +68,19 @@ public class ImageService {
                 subimage.setRGB(xx, yy, Dimensions.BLACK_COLOR.getVal());
             }
         }
+    }
+
+    private static String findCartNumberWithRegex(String stringToSearch) {
+
+        final String regexPattern = "((\\d){1}(R)(\\d){11})";
+
+        // create a pattern
+        Pattern pattern = Pattern.compile(regexPattern);
+
+        // get a matcher object
+        Matcher matcher = pattern.matcher(stringToSearch);
+
+        return (matcher.find()) ? (matcher.toMatchResult().group(1)) : (null);
     }
 
     private static List<String> getFinalDatas(String text) {
@@ -94,15 +108,17 @@ public class ImageService {
     }
 
 
-    private void detectText(String filePath, PrintStream out) throws Exception, IOException {
+    private String detectAllTextFromGivenImage(String filePath) throws Exception, IOException {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
         ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
         Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
-        AnnotateImageRequest request =
-                AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
+        AnnotateImageRequest request = AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
         requests.add(request);
 
         try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
@@ -111,33 +127,44 @@ public class ImageService {
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
-                    out.printf("Error: %s\n", res.getError().getMessage());
-                    return;
+                    log.error("ResponseList has error! error : {} ", res.getError().getMessage());
+                    return null;
                 }
 
                 // For full list of available annotations, see http://g.co/cloud/vision/docs
                 for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
-                    out.printf("Text: %s\n", annotation.getDescription());
-                    out.printf("Position : %s\n", annotation.getBoundingPoly());
+                    String textFormat = String.format("Text: %s\n", annotation.getDescription());
+                    String ppositionFormat = String.format("Position : %s\n", annotation.getBoundingPoly());
+
+                    stringBuilder.append(textFormat);
+                    stringBuilder.append(ppositionFormat);
                 }
             }
         }
+
+        return stringBuilder.toString();
     }
 
 
-    public void readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
+    public List<String> readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
         BufferedImage image = imageHelper.readScannedImageGetHeaderPart(false);
 
-        fileHelper.writeToTargetAsJpg(image, "croppedImage");
+        fileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
-        detectText(Config.SCANNED_FILE_PATH, new PrintStream(Config.TEMP_DIR + "googleVisionOutput.txt"));//TODO:Development[name prepare method]
+        String imageTexts = detectAllTextFromGivenImage(fileHelper.getCroppedImgPath());
+
+        String cardNumber = findCartNumberWithRegex(imageTexts);
+
+        log.info("Final data : {} ", cardNumber);
+
+        return Arrays.asList(cardNumber);
     }
 
     public List<String> readBarcodeWithZXingFromScannedImage() throws Exception {
 
         BufferedImage image = imageHelper.readScannedImageGetBarcodePart(false);
 
-        fileHelper.writeToTargetAsJpg(image, "croppedImage");
+        fileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
         BarcodeModel response = searchWhiteFrameInMainImage(image);
         return response.getDataList();
     }
@@ -186,7 +213,7 @@ public class ImageService {
 
         if (isHasWhiteFrame) {
             //imageHelper.displayScrollableImage(subimage);
-            String subImagePath = fileHelper.writeToTargetAsJpg(subimage, "image-" + x + "-" + y);
+            String subImagePath = fileHelper.writeToTempAsJpg(subimage, "image-" + x + "-" + y);
             response = tryReadDataMatrix(subImagePath);
         }
 
