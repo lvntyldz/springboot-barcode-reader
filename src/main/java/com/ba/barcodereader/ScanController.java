@@ -39,35 +39,26 @@ public class ScanController {
     @GetMapping("/scan-file/t")
     @ResponseBody
     public ResponseEntity<ResponseModel> scanAndReadByTesseract() {
-
         scannerService.scanFileFromScanner();
-        List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
-
-        return prepareResponseEntity(datas);
+        return prepareResponseEntity(imageService.readBarcodeWithTesseractFromScannedImageVia());
     }
 
     @GetMapping("/scan-file/gv")
     @ResponseBody
     public ResponseEntity<ResponseModel> scanAndReadByGoogleVision() {
-
         scannerService.scanFileFromScanner();
-        List<String> datas = imageService.readBarcodeWithGoogleVisionFromScannedImage();
-
-        return prepareResponseEntity(datas);
+        return prepareResponseEntity(imageService.readBarcodeWithGoogleVisionFromScannedImage());
     }
 
     @GetMapping("/scan-file/zx")
     @ResponseBody
     public ResponseEntity<ResponseModel> scanAndReadByZebraCrossing() {
-
         scannerService.scanFileFromScanner();
-        List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
-
-        return prepareResponseEntity(datas);
+        return prepareResponseEntity(imageService.readBarcodeWithZXingFromScannedImage());
     }
 
-    private ResponseEntity<ResponseModel> prepareResponseEntity(List<String> datas) {
-        ResponseModel response = new ResponseModel(datas, Arrays.asList(Config.SCANNED_FILE_PATH));
+    private ResponseEntity<ResponseModel> prepareResponseEntity(List<String> dataList) {
+        ResponseModel response = new ResponseModel(dataList, Arrays.asList(Config.SCANNED_FILE_PATH));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }

@@ -42,10 +42,10 @@ public class ImageService {
             return Arrays.asList(actualData);
         }
 
-        List<String> datas = TesseractHelper.getFinalDataByLength(text);
-        log.info("Final datas : {}", datas);
+        List<String> dataList = TesseractHelper.getFinalDataByLength(text);
+        log.info("Final dataList : {}", dataList);
 
-        return datas;
+        return dataList;
     }
 
     private String detectAllTextFromGivenImage(String filePath) {
