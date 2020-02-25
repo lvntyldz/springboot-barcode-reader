@@ -12,6 +12,7 @@ import com.google.protobuf.ByteString;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import java.util.*;
 
 
 @Service
+@Slf4j
 public class ImageService {
 
     @Autowired
@@ -46,7 +48,7 @@ public class ImageService {
 
         String text = getStringFromImage(subimage);
         List<String> data = getFinalDatas(text);
-        System.out.println("final Data : " + data);
+        log.info("Final Data : {}", data);
     }
 
     private static void imageToBlackWhite(BufferedImage subimage) {
@@ -210,10 +212,8 @@ public class ImageService {
             for (int i = -100; i < 100; i++) {
                 AffineTransform transform = new AffineTransform();
                 double rad = (double) i / 100;
-                double scale = (double) i / 100;
-                System.out.println("rad " + scale);
+                log.info("Rotating by rad value. rad : {}", rad);
                 transform.rotate(rad, before.getWidth() / 2, before.getHeight() / 2);
-                //transform.scale(scale, scale);
                 BufferedImage after = new BufferedImage(before.getWidth(), before.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
                 after = op.filter(before, after);
@@ -224,7 +224,7 @@ public class ImageService {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Something went wrong while rotating datamatrix! e:{}", e);
         }
         return response;
     }
@@ -242,6 +242,7 @@ public class ImageService {
         BarcodeModel barcodeModel = new BarcodeModel();
 
         try {
+
             if (hintsMap != null && !hintsMap.isEmpty()) {
                 tmpResult = tmpBarcodeReader.decode(tmpBitmap, hintsMap);
             } else {
@@ -251,8 +252,9 @@ public class ImageService {
             // setting results.
             tmpFinalResult = String.valueOf(tmpResult.getText());
             barcodeModel = new BarcodeModel(true, Arrays.asList(tmpFinalResult));
-        } catch (Exception tmpExcpt) {
-            tmpExcpt.printStackTrace();
+
+        } catch (Exception e) {
+            log.error("Something went wrong while decoding datamatrix! e:{} ", e);
         }
 
         return barcodeModel;
