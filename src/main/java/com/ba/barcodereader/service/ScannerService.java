@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScannerService {
 
-    public void scanFileFromScanner() throws InterruptedException {
+    public void scanFileFromScanner() {
         ScannerHelper.scanFile();
     }
 }

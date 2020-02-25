@@ -1,5 +1,6 @@
 package com.ba.barcodereader.helper;
 
+import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.props.Config;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,14 @@ public class FileHelper {
     private static final String JPG_EX = "jpg";
     private static final String JPG_FULL_EX = ".jpg";
 
-    public String writeToTempAsJpg(BufferedImage image, String name) throws IOException {
+    public String writeToTempAsJpg(BufferedImage image, String name) {
         String outputFilePath = getFullOutputFilePath(name);
         File output = new File(outputFilePath);
-        ImageIO.write(image, JPG_EX, output);
+        try {
+            ImageIO.write(image, JPG_EX, output);
+        } catch (IOException e) {
+            throw new SystemException("File write opreation failed!");
+        }
         return outputFilePath;
     }
 

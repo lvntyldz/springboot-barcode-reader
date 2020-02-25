@@ -29,18 +29,17 @@ public class ScanController {
 
     @Autowired
     FileHelper fileHelper;
-    
+
     @GetMapping
     @RequestMapping("/scan-file")
-    public String scanFile() throws InterruptedException {
+    public String scanFile() {
         scannerService.scanFileFromScanner();
         return "scan file completed";
     }
 
-    @GetMapping
-    @RequestMapping("/scan-file/t")
+    @GetMapping("/scan-file/t")
     @ResponseBody
-    public List<String> scanAndReadByTesseract() throws Exception {
+    public List<String> scanAndReadByTesseract() {
 
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
@@ -50,10 +49,9 @@ public class ScanController {
         return datas;
     }
 
-    @GetMapping
-    @RequestMapping("/scan-file/gv")
+    @GetMapping("/scan-file/gv")
     @ResponseBody
-    public List<String> scanAndReadByGoogleVision() throws Exception {
+    public List<String> scanAndReadByGoogleVision() {
 
         scannerService.scanFileFromScanner();
 
@@ -63,10 +61,9 @@ public class ScanController {
         return datas;
     }
 
-    @GetMapping
-    @RequestMapping("/scan-file/zx")
+    @GetMapping("/scan-file/zx")
     @ResponseBody
-    public List<String> scanAndReadByZebraCrossing() throws Exception {
+    public List<String> scanAndReadByZebraCrossing() {
 
         scannerService.scanFileFromScanner();
 

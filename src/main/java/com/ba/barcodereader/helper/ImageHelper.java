@@ -1,6 +1,7 @@
 package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.enums.Dimensions;
+import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.model.DimensionModel;
 import com.ba.barcodereader.props.Config;
 import lombok.extern.slf4j.Slf4j;
@@ -23,29 +24,35 @@ public class ImageHelper {
     @Autowired
     FileHelper fileHelper;
 
-    public BufferedImage readScannedImageGetHeaderPart(final boolean rotate) throws Exception {
+    public BufferedImage readScannedImageGetHeaderPart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareHeaderImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
-        //imageHelper.displayScrollableImage(image);
 
         return image;
     }
 
-    private BufferedImage getReadAndRotateImage(boolean rotate) throws IOException {
-        BufferedImage image = ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
-        fileHelper.writeToTempAsJpg(image, "originalImage");
+    private BufferedImage getReadAndRotateImage(boolean rotate) {
+        BufferedImage image = null;
 
-        if (rotate) {
-            image = rotateImage(image, 90);
-            fileHelper.writeToTempAsJpg(image, "rotatedImage");
+        try {
+            ImageIO.read(new FileInputStream(Config.SCANNED_FILE_PATH));
+            fileHelper.writeToTempAsJpg(image, "originalImage");
+
+            if (rotate) {
+                image = rotateImage(image, 90);
+                fileHelper.writeToTempAsJpg(image, "rotatedImage");
+            }
+        } catch (IOException e) {
+            log.error("File could not not read! e:{} ", e);
+            throw new SystemException("Could not read file");
         }
         return image;
     }
 
-    private DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.HEADER_FRAME_X.getVal();
         int w = Dimensions.HEADER_FRAME_W.getVal();
@@ -55,7 +62,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.BARCODE_FRAME_X.getVal();
         int w = Dimensions.BARCODE_FRAME_W.getVal();
@@ -65,7 +72,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) throws Exception {
+    private DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.TESSERACT_FRAME_X.getVal();
         int w = Dimensions.TESSERACT_FRAME_W.getVal();
@@ -112,7 +119,7 @@ public class ImageHelper {
         return finalBufferedImage;
     }
 
-    public BufferedImage readScannedImageGetBarcodePart(final boolean rotate) throws Exception {
+    public BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareBarcodeImageDimensionBy(image);
@@ -123,13 +130,12 @@ public class ImageHelper {
         return image;
     }
 
-    public BufferedImage readScannedImageGetTesseractPart(boolean rotate) throws Exception {
+    public BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionModel dim = prepareTesseractImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
-        //imageHelper.displayScrollableImage(image);
 
         return image;
     }

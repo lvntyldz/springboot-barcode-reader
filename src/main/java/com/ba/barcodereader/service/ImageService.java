@@ -2,6 +2,7 @@ package com.ba.barcodereader.service;
 
 
 import com.ba.barcodereader.enums.Dimensions;
+import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.model.BarcodeModel;
@@ -40,7 +41,7 @@ public class ImageService {
     @Autowired
     FileHelper fileHelper;
 
-    public List<String> readBarcodeWithTesseractFromScannedImageVia() throws Exception {
+    public List<String> readBarcodeWithTesseractFromScannedImageVia() {
         BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
         fileHelper.writeToTempAsJpg(subimage, Config.CROP_IMG_NAME);
@@ -110,20 +111,31 @@ public class ImageService {
         return data;
     }
 
-    private String getStringFromImage(BufferedImage subimage) throws TesseractException {
+    private String getStringFromImage(BufferedImage subimage) {
         Tesseract tesseract = new Tesseract();
         tesseract.setDatapath(Config.DATA_FOLDER);
-        return tesseract.doOCR(subimage);
+        try {
+            return tesseract.doOCR(subimage);
+        } catch (TesseractException e) {
+            log.error("OCR not read image as text! e : {} ", e);
+            throw new SystemException("Could not read text!");
+        }
     }
 
 
-    private String detectAllTextFromGivenImage(String filePath) throws Exception, IOException {
+    private String detectAllTextFromGivenImage(String filePath) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
-        ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+        ByteString imgBytes = null;
+        try {
+            imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+        } catch (IOException e) {
+            log.error("Something went wrong while reading image file! File path : {} - e: {} ", filePath, e);
+            throw new SystemException("Read image file failed!");
+        }
 
         Image img = Image.newBuilder().setContent(imgBytes).build();
         Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
@@ -149,13 +161,16 @@ public class ImageService {
                     stringBuilder.append(ppositionFormat);
                 }
             }
+        } catch (IOException e) {
+            log.error("Something went wrong while reading image with google cloud vision!  e: {} ", e);
+            throw new SystemException("Google vision not read file!");
         }
 
         return stringBuilder.toString();
     }
 
 
-    public List<String> readBarcodeWithGoogleVisionFromScannedImage() throws Exception {
+    public List<String> readBarcodeWithGoogleVisionFromScannedImage() {
         BufferedImage image = imageHelper.readScannedImageGetHeaderPart(false);
 
         fileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
@@ -169,7 +184,7 @@ public class ImageService {
         return Arrays.asList(cardNumber);
     }
 
-    public List<String> readBarcodeWithZXingFromScannedImage() throws Exception {
+    public List<String> readBarcodeWithZXingFromScannedImage() {
 
         BufferedImage image = imageHelper.readScannedImageGetBarcodePart(false);
 
@@ -178,7 +193,7 @@ public class ImageService {
         return response.getDataList();
     }
 
-    private BarcodeModel searchWhiteFrameInMainImage(BufferedImage image) throws IOException {
+    private BarcodeModel searchWhiteFrameInMainImage(BufferedImage image) {
         int height = image.getHeight();
         int width = image.getWidth();
         BarcodeModel response = new BarcodeModel();
@@ -202,7 +217,7 @@ public class ImageService {
         return response;
     }
 
-    private BarcodeModel checkWhiteFrameAndwriteToFile(BufferedImage subimage) throws IOException {
+    private BarcodeModel checkWhiteFrameAndwriteToFile(BufferedImage subimage) {
 
         boolean isHasWhiteFrame = true;
         int subimageHeight = subimage.getHeight();
