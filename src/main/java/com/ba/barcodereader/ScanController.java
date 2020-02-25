@@ -45,7 +45,7 @@ public class ScanController {
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithTesseractFromScannedImageVia();
 
-        log.info("result : {} ", datas);
+        log.info("scan-file/t result : {} ", datas);
 
         return datas;
     }
@@ -58,7 +58,7 @@ public class ScanController {
         scannerService.scanFileFromScanner();
 
         List<String> datas = imageService.readBarcodeWithGoogleVisionFromScannedImage();
-        log.info("result : {} ", datas);
+        log.info("scan-file/gv result : {} ", datas);
 
         return datas;
     }
@@ -71,7 +71,7 @@ public class ScanController {
         scannerService.scanFileFromScanner();
 
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
-        log.info("result : {} ", datas);
+        log.info("scan-file/zx result : {} ", datas);
 
         return datas;
     }

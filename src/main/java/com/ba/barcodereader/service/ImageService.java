@@ -44,7 +44,6 @@ public class ImageService {
         BufferedImage subimage = imageHelper.readScannedImageGetTesseractPart(false);
 
         fileHelper.writeToTempAsJpg(subimage, Config.CROP_IMG_NAME);
-        //searchWhiteFrameInMainImage(image);
         imageToBlackWhite(subimage);
 
         fileHelper.writeToTempAsJpg(subimage, "blackWhiteImage");
@@ -185,15 +184,15 @@ public class ImageService {
         BarcodeModel response = new BarcodeModel();
 
         outerloop:
-        for (int y = 0; y < height; y = y + 5) {
-            for (int x = 0; x < width; x = x + 5) {
+        for (int y = 0; y < height; y = y + 10) {
+            for (int x = 0; x < width; x = x + 10) {
 
                 if (x + Dimensions.SUB_IMAGE_DIMENSION.getVal() > width || y + Dimensions.SUB_IMAGE_DIMENSION.getVal() > height) {
                     continue;
                 }
 
                 BufferedImage subimage = image.getSubimage(x, y, Dimensions.SUB_IMAGE_DIMENSION.getVal(), Dimensions.SUB_IMAGE_DIMENSION.getVal());
-                response = checkWhiteFrameAndwriteToFile(x, y, subimage);
+                response = checkWhiteFrameAndwriteToFile(subimage);
                 if (response.isReadSuccessfully()) {
                     break outerloop;
                 }
@@ -203,7 +202,7 @@ public class ImageService {
         return response;
     }
 
-    private BarcodeModel checkWhiteFrameAndwriteToFile(int x, int y, BufferedImage subimage) throws IOException {
+    private BarcodeModel checkWhiteFrameAndwriteToFile(BufferedImage subimage) throws IOException {
 
         boolean isHasWhiteFrame = true;
         int subimageHeight = subimage.getHeight();
@@ -222,8 +221,7 @@ public class ImageService {
         BarcodeModel response = new BarcodeModel();
 
         if (isHasWhiteFrame) {
-            //imageHelper.displayScrollableImage(subimage);
-            String subImagePath = fileHelper.writeToTempAsJpg(subimage, "image-" + x + "-" + y);
+            String subImagePath = fileHelper.writeToTempAsJpg(subimage, Config.WHITE_FRAME_IMG_NAME);
             response = tryReadDataMatrix(subImagePath);
         }
 

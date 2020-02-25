@@ -28,4 +28,8 @@ public class FileHelper {
     public String getCroppedImgPath() {
         return getFullOutputFilePath(Config.CROP_IMG_NAME);
     }
+
+    public String getWhiteFrameImgPath() {
+        return getFullOutputFilePath(Config.WHITE_FRAME_IMG_NAME);
+    }
 }
