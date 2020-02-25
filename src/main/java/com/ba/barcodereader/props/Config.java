@@ -12,5 +12,6 @@ public class Config {
     //public static final String DATA_FOLDER = "/usr/local/Cellar/tesseract/4.1.1/share/tessdata";//mac
     public static final String DATA_FOLDER = "C:\\Program Files\\Tesseract-OCR\\tessdata";//windows
     public static final String CROP_IMG_NAME = "croppedImage";
+    public static final String WHITE_FRAME_IMG_NAME = "whiteFrameImage";
 
 }
