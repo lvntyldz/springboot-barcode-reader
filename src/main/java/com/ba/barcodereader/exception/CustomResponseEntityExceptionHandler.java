@@ -15,19 +15,25 @@ import java.util.Date;
 @ControllerAdvice
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(BusinessRuleException.class)
+    public final ResponseEntity<ErrorResponseModel> handleBusinessRuleException(BusinessRuleException e, WebRequest request) {
+        ErrorResponseModel response = prepareResponseModel(e.getMessage(), request);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(SystemException.class)
     public final ResponseEntity<ErrorResponseModel> handleSystemException(SystemException e, WebRequest request) {
         ErrorResponseModel response = prepareResponseModel(e.getMessage(), request);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ErrorResponseModel prepareResponseModel(String message, WebRequest request) {
-        return new ErrorResponseModel(new Date(), message, request.getDescription(false));
-    }
-
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ErrorResponseModel> handlerException(Exception e, WebRequest request) {
         ErrorResponseModel response = prepareResponseModel(e.getMessage(), request);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ErrorResponseModel prepareResponseModel(String message, WebRequest request) {
+        return new ErrorResponseModel(new Date(), message, request.getDescription(false));
     }
 }
