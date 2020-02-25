@@ -11,5 +11,6 @@ public class Config {
     //public static final String DATA_FOLDER = "/usr/share/tesseract-ocr/4.00/tessdata";//ubuntu
     //public static final String DATA_FOLDER = "/usr/local/Cellar/tesseract/4.1.1/share/tessdata";//mac
     public static final String DATA_FOLDER = "C:\\tesseract\\4.1.1\\tessdata";//windows
+    public static final String CROP_IMG_NAME = "croppedImage";
 
 }
