@@ -4,10 +4,12 @@ import com.ba.barcodereader.helper.FileHelper;
 import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -63,12 +65,13 @@ public class ScanController {
 
     @GetMapping
     @RequestMapping("/scan-file/zx")
-    public String scanAndReadByZebraCrossing() throws Exception {
+    @ResponseBody
+    public List<String> scanAndReadByZebraCrossing() throws Exception {
 
         scannerService.scanFileFromScanner();
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
         log.info("result : {} ", datas);
 
-        return "scan file and read barcode with Google Zebra Crossing API completed";
+        return datas;
     }
 }
