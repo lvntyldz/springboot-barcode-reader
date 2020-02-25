@@ -1,29 +1,20 @@
 package com.ba.barcodereader.service;
 
 
-import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.helper.*;
 import com.ba.barcodereader.model.BarcodeModel;
-import com.ba.barcodereader.props.Config;
-import com.ba.barcodereader.util.ImageUtils;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
-import com.google.zxing.*;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.common.HybridBinarizer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Service

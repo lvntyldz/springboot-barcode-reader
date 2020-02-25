@@ -1,7 +1,5 @@
 package com.ba.barcodereader;
 
-import com.ba.barcodereader.helper.FileHelper;
-import com.ba.barcodereader.helper.ImageHelper;
 import com.ba.barcodereader.model.ResponseModel;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
@@ -24,10 +22,9 @@ import java.util.List;
 public class ScanController {
 
     @Autowired
-    private ScannerService scannerService;
-
-    @Autowired
     ImageService imageService;
+    @Autowired
+    private ScannerService scannerService;
 
     @GetMapping
     @RequestMapping("/scan-file")

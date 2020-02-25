@@ -3,7 +3,6 @@ package com.ba.barcodereader.helper;
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.props.Config;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
