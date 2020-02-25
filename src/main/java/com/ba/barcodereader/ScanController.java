@@ -51,9 +51,7 @@ public class ScanController {
     public ResponseEntity<ResponseModel> scanAndReadByGoogleVision() {
 
         scannerService.scanFileFromScanner();
-
         List<String> datas = imageService.readBarcodeWithGoogleVisionFromScannedImage();
-        log.info("scan-file/gv result : {} ", datas);
 
         return prepareResponseEntity(datas);
     }
@@ -63,9 +61,7 @@ public class ScanController {
     public ResponseEntity<ResponseModel> scanAndReadByZebraCrossing() {
 
         scannerService.scanFileFromScanner();
-
         List<String> datas = imageService.readBarcodeWithZXingFromScannedImage();
-        log.info("scan-file/zx result : {} ", datas);
 
         return prepareResponseEntity(datas);
     }

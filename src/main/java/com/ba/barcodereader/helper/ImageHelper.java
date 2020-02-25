@@ -44,6 +44,8 @@ public class ImageHelper {
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
 
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
+
         return image;
     }
 
@@ -138,7 +140,8 @@ public class ImageHelper {
         DimensionModel dim = prepareBarcodeImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
-        //imageHelper.displayScrollableImage(image);
+
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
         return image;
     }
