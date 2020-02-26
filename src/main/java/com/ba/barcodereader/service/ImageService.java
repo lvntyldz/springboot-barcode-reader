@@ -39,56 +39,10 @@ public class ImageService {
         return dataList;
     }
 
-    private String detectAllTextFromGivenImage(String filePath) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        List<AnnotateImageRequest> requests = new ArrayList<>();
-
-        ByteString imgBytes = null;
-        try {
-            imgBytes = ByteString.readFrom(new FileInputStream(filePath));
-        } catch (IOException e) {
-            log.error("Something went wrong while reading image file! File path : {} - e: {} ", filePath, e);
-            throw new SystemException("Read image file failed!");
-        }
-
-        Image img = Image.newBuilder().setContent(imgBytes).build();
-        Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
-        AnnotateImageRequest request = AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
-        requests.add(request);
-
-        try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
-            BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
-            List<AnnotateImageResponse> responses = response.getResponsesList();
-
-            for (AnnotateImageResponse res : responses) {
-                if (res.hasError()) {
-                    log.error("ResponseList has error! error : {} ", res.getError().getMessage());
-                    return null;
-                }
-
-                // For full list of available annotations, see http://g.co/cloud/vision/docs
-                for (EntityAnnotation annotation : res.getTextAnnotationsList()) {
-                    String textFormat = String.format("Text: %s\n", annotation.getDescription());
-                    String ppositionFormat = String.format("Position : %s\n", annotation.getBoundingPoly());
-
-                    stringBuilder.append(textFormat);
-                    stringBuilder.append(ppositionFormat);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Something went wrong while reading image with google cloud vision!  e: {} ", e);
-            throw new SystemException("Google vision not read file!");
-        }
-
-        return stringBuilder.toString();
-    }
-
     public List<String> readBarcodeWithGoogleVisionFromScannedImage() {
         ImageHelper.readScannedImageGetHeaderPart(false);
 
-        String imageTexts = detectAllTextFromGivenImage(FileHelper.getCroppedImgPath());
+        String imageTexts = GVisionHelper.detectAllTextFromGivenImage(FileHelper.getCroppedImgPath());
 
         String cardNumber = RegexHelper.findCartNumberWithRegex(imageTexts);
 

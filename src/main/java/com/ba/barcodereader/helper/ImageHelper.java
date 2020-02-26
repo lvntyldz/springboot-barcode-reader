@@ -4,6 +4,8 @@ import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.model.DimensionModel;
 import com.ba.barcodereader.props.Config;
+import com.google.cloud.vision.v1.Image;
+import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -18,6 +20,19 @@ import java.io.IOException;
 public class ImageHelper {
 
     private ImageHelper() {
+    }
+
+    public static Image getImageFromGivenPath(String filePath) {
+        ByteString imgBytes = null;
+
+        try {
+            imgBytes = ByteString.readFrom(new FileInputStream(filePath));
+        } catch (IOException e) {
+            log.error("Something went wrong while reading image file! File path : {} - e: {} ", filePath, e);
+            throw new SystemException("Read image file failed!");
+        }
+
+        return Image.newBuilder().setContent(imgBytes).build();
     }
 
     public static void convertToBlackWhite(BufferedImage subimage) {
