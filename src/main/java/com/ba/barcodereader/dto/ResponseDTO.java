@@ -1,4 +1,4 @@
-package com.ba.barcodereader.model;
+package com.ba.barcodereader.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseModel {
+public class ResponseDTO {
     private List<String> barcodes;
     private List<String> files;
 }

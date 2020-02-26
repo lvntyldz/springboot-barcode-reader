@@ -1,6 +1,6 @@
 package com.ba.barcodereader;
 
-import com.ba.barcodereader.model.ResponseModel;
+import com.ba.barcodereader.dto.ResponseDTO;
 import com.ba.barcodereader.props.Config;
 import com.ba.barcodereader.service.ImageService;
 import com.ba.barcodereader.service.ScannerService;
@@ -35,27 +35,27 @@ public class ScanController {
 
     @GetMapping("/scan-file/t")
     @ResponseBody
-    public ResponseEntity<ResponseModel> scanAndReadByTesseract() {
+    public ResponseEntity<ResponseDTO> scanAndReadByTesseract() {
         scannerService.scanFileFromScanner();
         return prepareResponseEntity(imageService.readBarcodeWithTesseractFromScannedImageVia());
     }
 
     @GetMapping("/scan-file/gv")
     @ResponseBody
-    public ResponseEntity<ResponseModel> scanAndReadByGoogleVision() {
+    public ResponseEntity<ResponseDTO> scanAndReadByGoogleVision() {
         scannerService.scanFileFromScanner();
         return prepareResponseEntity(imageService.readBarcodeWithGoogleVisionFromScannedImage());
     }
 
     @GetMapping("/scan-file/zx")
     @ResponseBody
-    public ResponseEntity<ResponseModel> scanAndReadByZebraCrossing() {
+    public ResponseEntity<ResponseDTO> scanAndReadByZebraCrossing() {
         scannerService.scanFileFromScanner();
         return prepareResponseEntity(imageService.readBarcodeWithZXingFromScannedImage());
     }
 
-    private ResponseEntity<ResponseModel> prepareResponseEntity(List<String> dataList) {
-        ResponseModel response = new ResponseModel(dataList, Arrays.asList(Config.SCANNED_FILE_PATH));
+    private ResponseEntity<ResponseDTO> prepareResponseEntity(List<String> dataList) {
+        ResponseDTO response = new ResponseDTO(dataList, Arrays.asList(Config.SCANNED_FILE_PATH));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }

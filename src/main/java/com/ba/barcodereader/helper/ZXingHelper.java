@@ -1,7 +1,7 @@
 package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.enums.Dimensions;
-import com.ba.barcodereader.model.BarcodeModel;
+import com.ba.barcodereader.dto.BarcodeDTO;
 import com.ba.barcodereader.props.Config;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -25,10 +25,10 @@ public class ZXingHelper {
     private ZXingHelper() {
     }
 
-    public static BarcodeModel searchWhiteFrameInMainImage(BufferedImage image) {
+    public static BarcodeDTO searchWhiteFrameInMainImage(BufferedImage image) {
         int height = image.getHeight();
         int width = image.getWidth();
-        BarcodeModel response = new BarcodeModel();
+        BarcodeDTO response = new BarcodeDTO();
 
         outerloop:
         for (int y = 0; y < height; y = y + 10) {
@@ -49,7 +49,7 @@ public class ZXingHelper {
         return response;
     }
 
-    private static BarcodeModel checkWhiteFrameAndwriteToFile(BufferedImage subimage) {
+    private static BarcodeDTO checkWhiteFrameAndwriteToFile(BufferedImage subimage) {
 
         boolean isHasWhiteFrame = true;
         int subimageHeight = subimage.getHeight();
@@ -65,7 +65,7 @@ public class ZXingHelper {
             }
         }
 
-        BarcodeModel response = new BarcodeModel();
+        BarcodeDTO response = new BarcodeDTO();
 
         if (isHasWhiteFrame) {
             String subImagePath = FileHelper.writeToTempAsJpg(subimage, Config.WHITE_FRAME_IMG_NAME);
@@ -76,8 +76,8 @@ public class ZXingHelper {
 
     }
 
-    private static BarcodeModel tryReadDataMatrix(String filePath) {
-        BarcodeModel response = new BarcodeModel();
+    private static BarcodeDTO tryReadDataMatrix(String filePath) {
+        BarcodeDTO response = new BarcodeDTO();
         BufferedImage before = null;
         Map<DecodeHintType, Object> hintsMap;
         hintsMap = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
@@ -111,7 +111,7 @@ public class ZXingHelper {
         return response;
     }
 
-    private static BarcodeModel decode(BufferedImage tmpBfrImage, Map<DecodeHintType, Object> hintsMap) {
+    private static BarcodeDTO decode(BufferedImage tmpBfrImage, Map<DecodeHintType, Object> hintsMap) {
         if (tmpBfrImage == null)
             throw new IllegalArgumentException("Could not decode image.");
 
@@ -121,7 +121,7 @@ public class ZXingHelper {
 
         Result tmpResult;
         String tmpFinalResult;
-        BarcodeModel barcodeModel = new BarcodeModel();
+        BarcodeDTO barcodeDto = new BarcodeDTO();
 
         try {
 
@@ -133,13 +133,13 @@ public class ZXingHelper {
 
             // setting results.
             tmpFinalResult = String.valueOf(tmpResult.getText());
-            barcodeModel = new BarcodeModel(true, Arrays.asList(tmpFinalResult));
+            barcodeDto = new BarcodeDTO(true, Arrays.asList(tmpFinalResult));
 
         } catch (Exception e) {
             log.error("Something went wrong while decoding datamatrix! e:{} ", e);
         }
 
-        return barcodeModel;
+        return barcodeDto;
     }
 
 }

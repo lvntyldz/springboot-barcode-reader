@@ -1,4 +1,4 @@
-package com.ba.barcodereader.model;
+package com.ba.barcodereader.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DimensionModel {
+public class DimensionDTO {
 
     private int xPoint;
     private int yPoint;

@@ -1,4 +1,4 @@
-package com.ba.barcodereader.model;
+package com.ba.barcodereader.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorResponseModel {
+public class ErrorResponseDTO {
     private Date timestamp;
     private String message;
     private String details;

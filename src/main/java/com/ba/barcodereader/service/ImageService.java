@@ -1,18 +1,12 @@
 package com.ba.barcodereader.service;
 
 
-import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.helper.*;
-import com.ba.barcodereader.model.BarcodeModel;
-import com.google.cloud.vision.v1.*;
-import com.google.protobuf.ByteString;
+import com.ba.barcodereader.dto.BarcodeDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +47,7 @@ public class ImageService {
 
     public List<String> readBarcodeWithZXingFromScannedImage() {
         BufferedImage image = ImageHelper.readScannedImageGetBarcodePart(false);
-        BarcodeModel response = ZXingHelper.searchWhiteFrameInMainImage(image);
+        BarcodeDTO response = ZXingHelper.searchWhiteFrameInMainImage(image);
         return response.getDataList();
     }
 }

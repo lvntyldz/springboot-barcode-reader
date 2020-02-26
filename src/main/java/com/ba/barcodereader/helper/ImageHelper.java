@@ -2,7 +2,7 @@ package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.exception.SystemException;
-import com.ba.barcodereader.model.DimensionModel;
+import com.ba.barcodereader.dto.DimensionDTO;
 import com.ba.barcodereader.props.Config;
 import com.google.cloud.vision.v1.Image;
 import com.google.protobuf.ByteString;
@@ -58,7 +58,7 @@ public class ImageHelper {
     public static BufferedImage readScannedImageGetHeaderPart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        DimensionModel dim = prepareHeaderImageDimensionBy(image);
+        DimensionDTO dim = prepareHeaderImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
 
@@ -70,7 +70,7 @@ public class ImageHelper {
     public static BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        DimensionModel dim = prepareBarcodeImageDimensionBy(image);
+        DimensionDTO dim = prepareBarcodeImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
 
@@ -82,7 +82,7 @@ public class ImageHelper {
     public static BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
 
         BufferedImage image = getReadAndRotateImage(rotate);
-        DimensionModel dim = prepareTesseractImageDimensionBy(image);
+        DimensionDTO dim = prepareTesseractImageDimensionBy(image);
 
         image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
 
@@ -122,7 +122,7 @@ public class ImageHelper {
         return image;
     }
 
-    private static DimensionModel prepareHeaderImageDimensionBy(BufferedImage image) {
+    private static DimensionDTO prepareHeaderImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.HEADER_FRAME_X.getVal();
         int w = Dimensions.HEADER_FRAME_W.getVal();
@@ -132,7 +132,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private static DimensionModel prepareBarcodeImageDimensionBy(BufferedImage image) {
+    private static DimensionDTO prepareBarcodeImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.BARCODE_FRAME_X.getVal();
         int w = Dimensions.BARCODE_FRAME_W.getVal();
@@ -142,7 +142,7 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private static DimensionModel prepareTesseractImageDimensionBy(BufferedImage image) {
+    private static DimensionDTO prepareTesseractImageDimensionBy(BufferedImage image) {
 
         int x = Dimensions.TESSERACT_FRAME_X.getVal();
         int w = Dimensions.TESSERACT_FRAME_W.getVal();
@@ -152,23 +152,23 @@ public class ImageHelper {
         return getImageDimensionBy(image, x, w, y, h);
     }
 
-    private static DimensionModel getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
+    private static DimensionDTO getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
         if (x + w > image.getWidth() && y + h > image.getHeight()) {
             log.warn("Aranan resim genişliği ve yüksekliği mevcut resimden daha büyük!");
-            return new DimensionModel(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
+            return new DimensionDTO(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
         }
 
         if (x + w > image.getWidth()) {
             log.warn("Aranan resim genişliği mevcut resimden daha büyük!");
-            return new DimensionModel(x, y, Math.abs((image.getWidth() - x)), h);
+            return new DimensionDTO(x, y, Math.abs((image.getWidth() - x)), h);
         }
 
         if (y + h > image.getHeight()) {
             log.warn("Aranan resim yükseklği mevcut resimden daha büyük!");
-            return new DimensionModel(x, y, w, Math.abs((image.getHeight() - y)));
+            return new DimensionDTO(x, y, w, Math.abs((image.getHeight() - y)));
         }
 
-        return new DimensionModel(x, y, w, h);
+        return new DimensionDTO(x, y, w, h);
     }
 
     private static BufferedImage rotateImage(BufferedImage image, double degrees) {
