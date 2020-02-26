@@ -15,6 +15,9 @@ public class FileHelper {
     private static final String JPG_EX = "jpg";
     private static final String JPG_FULL_EX = ".jpg";
 
+    private FileHelper() {
+    }
+
     public static String writeToTempAsJpg(BufferedImage image, String name) {
         String outputFilePath = getFullOutputFilePath(name);
         File output = new File(outputFilePath);

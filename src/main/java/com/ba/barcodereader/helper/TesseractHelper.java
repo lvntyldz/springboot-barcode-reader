@@ -13,6 +13,9 @@ import java.util.List;
 @Slf4j
 public class TesseractHelper {
 
+    private TesseractHelper() {
+    }
+
     public static List<String> getFinalDataByLength(String text) {
         log.info("All text data to search : {}", text);
 

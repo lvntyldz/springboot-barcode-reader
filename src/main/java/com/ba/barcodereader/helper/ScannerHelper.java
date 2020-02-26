@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ScannerHelper {
 
+    private ScannerHelper() {
+    }
+
     public static void scanFile() {
 
         try {

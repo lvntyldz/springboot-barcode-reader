@@ -17,6 +17,9 @@ import java.io.IOException;
 @Slf4j
 public class ImageHelper {
 
+    private ImageHelper() {
+    }
+
     public static void convertToBlackWhite(BufferedImage subimage) {
         for (int xx = 0; xx < subimage.getWidth(); xx++) {
             for (int yy = 0; yy < subimage.getHeight(); yy++) {
@@ -47,6 +50,43 @@ public class ImageHelper {
         FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
         return image;
+    }
+
+    public static BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
+
+        BufferedImage image = getReadAndRotateImage(rotate);
+        DimensionModel dim = prepareBarcodeImageDimensionBy(image);
+
+        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
+
+        return image;
+    }
+
+    public static BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
+
+        BufferedImage image = getReadAndRotateImage(rotate);
+        DimensionModel dim = prepareTesseractImageDimensionBy(image);
+
+        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+
+        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
+
+        return image;
+    }
+
+    public static boolean isWhiteColor(BufferedImage subimage, int x, int y, int rgbThreshold) {
+        int clr = subimage.getRGB(x, y);
+        int red = (clr & 0x00ff0000) >> 16;
+        int green = (clr & 0x0000ff00) >> 8;
+        int blue = clr & 0x000000ff;
+
+        return isWhiteColorRange(red, green, blue, rgbThreshold);
+    }
+
+    private static boolean isWhiteColorRange(int red, int green, int blue, int rgbThreshold) {
+        return (red > rgbThreshold && green > rgbThreshold && blue > rgbThreshold);
     }
 
     private static BufferedImage getReadAndRotateImage(boolean rotate) {
@@ -118,7 +158,7 @@ public class ImageHelper {
 
     private static BufferedImage rotateImage(BufferedImage image, double degrees) {
 
-        final double rads = Math.toRadians(90);
+        final double rads = Math.toRadians(degrees);
         final double sin = Math.abs(Math.sin(rads));
         final double cos = Math.abs(Math.cos(rads));
         final int w = (int) Math.floor(image.getWidth() * cos + image.getHeight() * sin);
@@ -134,30 +174,6 @@ public class ImageHelper {
         return finalBufferedImage;
     }
 
-    public static BufferedImage readScannedImageGetBarcodePart(final boolean rotate) {
-
-        BufferedImage image = getReadAndRotateImage(rotate);
-        DimensionModel dim = prepareBarcodeImageDimensionBy(image);
-
-        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
-
-        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
-
-        return image;
-    }
-
-    public static BufferedImage readScannedImageGetTesseractPart(boolean rotate) {
-
-        BufferedImage image = getReadAndRotateImage(rotate);
-        DimensionModel dim = prepareTesseractImageDimensionBy(image);
-
-        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
-
-        FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
-
-        return image;
-    }
-
     public void displayScrollableImage(BufferedImage image) {
         JFrame frame = new JFrame();
         ImageIcon ii = new ImageIcon(image);
@@ -167,5 +183,4 @@ public class ImageHelper {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-
 }

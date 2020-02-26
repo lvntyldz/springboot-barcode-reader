@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 @Slf4j
 public class RegexHelper {
 
+    private RegexHelper() {
+    }
+
     public static String findCartNumberWithRegex(String stringToSearch) {
 
         log.info("All regex data to search : {}", stringToSearch);

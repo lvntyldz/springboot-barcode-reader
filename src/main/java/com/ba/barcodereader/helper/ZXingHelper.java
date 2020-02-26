@@ -3,7 +3,6 @@ package com.ba.barcodereader.helper;
 import com.ba.barcodereader.enums.Dimensions;
 import com.ba.barcodereader.model.BarcodeModel;
 import com.ba.barcodereader.props.Config;
-import com.ba.barcodereader.util.ImageUtils;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
@@ -22,6 +21,9 @@ import java.util.Map;
 
 @Slf4j
 public class ZXingHelper {
+
+    private ZXingHelper() {
+    }
 
     public static BarcodeModel searchWhiteFrameInMainImage(BufferedImage image) {
         int height = image.getHeight();
@@ -56,7 +58,7 @@ public class ZXingHelper {
         for (int i = 0; i < subimageWidth; i++) {
             for (int j = 0; j < subimageHeight; j++) {
 
-                if ((i == 0 || j == 0 || i + 1 == subimageWidth || j + 1 == subimageHeight) && !ImageUtils.isWhiteColor(subimage, i, j, Dimensions.RGB_WHITE_THRESHOLD.getVal())) {
+                if ((i == 0 || j == 0 || i + 1 == subimageWidth || j + 1 == subimageHeight) && !ImageHelper.isWhiteColor(subimage, i, j, Dimensions.RGB_WHITE_THRESHOLD.getVal())) {
                     isHasWhiteFrame = false;
                     break;
                 }
