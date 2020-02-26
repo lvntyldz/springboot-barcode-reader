@@ -6,7 +6,6 @@ import com.ba.barcodereader.dto.DimensionDTO;
 import com.ba.barcodereader.props.Config;
 import com.google.cloud.vision.v1.Image;
 import com.google.protobuf.ByteString;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,7 +15,6 @@ import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@Slf4j
 public class ImageHelper {
 
     private ImageHelper() {
@@ -28,7 +26,7 @@ public class ImageHelper {
         try {
             imgBytes = ByteString.readFrom(new FileInputStream(filePath));
         } catch (IOException e) {
-            log.error("Something went wrong while reading image file! File path : {} - e: {} ", filePath, e);
+            //log.error("Something went wrong while reading image file! File path : {} - e: {} ", filePath, e);
             throw new SystemException("Read image file failed!");
         }
 
@@ -60,7 +58,7 @@ public class ImageHelper {
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionDTO dim = prepareHeaderImageDimensionBy(image);
 
-        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+        image = image.getSubimage(dim.getxPoint(), dim.getyPoint(), dim.getWidth(), dim.getHeight());
 
         FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
@@ -72,7 +70,7 @@ public class ImageHelper {
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionDTO dim = prepareBarcodeImageDimensionBy(image);
 
-        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+        image = image.getSubimage(dim.getxPoint(), dim.getyPoint(), dim.getWidth(), dim.getHeight());
 
         FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
@@ -84,7 +82,7 @@ public class ImageHelper {
         BufferedImage image = getReadAndRotateImage(rotate);
         DimensionDTO dim = prepareTesseractImageDimensionBy(image);
 
-        image = image.getSubimage(dim.getXPoint(), dim.getYPoint(), dim.getWidth(), dim.getHeight());
+        image = image.getSubimage(dim.getxPoint(), dim.getyPoint(), dim.getWidth(), dim.getHeight());
 
         FileHelper.writeToTempAsJpg(image, Config.CROP_IMG_NAME);
 
@@ -116,7 +114,7 @@ public class ImageHelper {
                 FileHelper.writeToTempAsJpg(image, "rotatedImage");
             }
         } catch (IOException e) {
-            log.error("File could not not read! e:{} ", e);
+            //log.error("File could not not read! e:{} ", e);
             throw new SystemException("Could not read file");
         }
         return image;
@@ -154,17 +152,14 @@ public class ImageHelper {
 
     private static DimensionDTO getImageDimensionBy(BufferedImage image, int x, int w, int y, int h) {
         if (x + w > image.getWidth() && y + h > image.getHeight()) {
-            log.warn("Aranan resim genişliği ve yüksekliği mevcut resimden daha büyük!");
             return new DimensionDTO(x, y, Math.abs((image.getWidth() - x)), Math.abs((image.getHeight() - y)));
         }
 
         if (x + w > image.getWidth()) {
-            log.warn("Aranan resim genişliği mevcut resimden daha büyük!");
             return new DimensionDTO(x, y, Math.abs((image.getWidth() - x)), h);
         }
 
         if (y + h > image.getHeight()) {
-            log.warn("Aranan resim yükseklği mevcut resimden daha büyük!");
             return new DimensionDTO(x, y, w, Math.abs((image.getHeight() - y)));
         }
 

@@ -2,14 +2,12 @@ package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.props.Config;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-@Slf4j
 public class FileHelper {
 
     private static final String JPG_EX = "jpg";

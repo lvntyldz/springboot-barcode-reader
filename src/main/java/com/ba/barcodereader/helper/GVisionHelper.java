@@ -2,13 +2,11 @@ package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.exception.SystemException;
 import com.google.cloud.vision.v1.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class GVisionHelper {
 
     private GVisionHelper() {
@@ -34,7 +32,7 @@ public class GVisionHelper {
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
-                    log.error("ResponseList has error! error : {} ", res.getError().getMessage());
+                    //log.error("ResponseList has error! error : {} ", res.getError().getMessage());
                     return null;
                 }
 
@@ -42,7 +40,7 @@ public class GVisionHelper {
             }
 
         } catch (IOException e) {
-            log.error("Something went wrong while reading image with google cloud vision!  e: {} ", e);
+            //log.error("Something went wrong while reading image with google cloud vision!  e: {} ", e);
             throw new SystemException("Google vision not read file!");
         }
 

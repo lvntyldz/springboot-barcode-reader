@@ -6,7 +6,6 @@ import com.ba.barcodereader.props.Config;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
@@ -19,7 +18,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
-@Slf4j
 public class ZXingHelper {
 
     private ZXingHelper() {
@@ -94,7 +92,6 @@ public class ZXingHelper {
             for (int i = -100; i < 100; i++) {
                 AffineTransform transform = new AffineTransform();
                 double rad = (double) i / 100;
-                log.info("Rotating by rad value. rad : {}", rad);
                 transform.rotate(rad, before.getWidth() / 2, before.getHeight() / 2);
                 BufferedImage after = new BufferedImage(before.getWidth(), before.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
@@ -106,7 +103,7 @@ public class ZXingHelper {
             }
 
         } catch (IOException e) {
-            log.error("Something went wrong while rotating datamatrix! e:{}", e);
+            //log.error("Something went wrong while rotating datamatrix! e:{}", e);
         }
         return response;
     }
@@ -136,7 +133,7 @@ public class ZXingHelper {
             barcodeDto = new BarcodeDTO(true, Arrays.asList(tmpFinalResult));
 
         } catch (Exception e) {
-            log.error("Something went wrong while decoding datamatrix! e:{} ", e);
+            //log.error("Something went wrong while decoding datamatrix! e:{} ", e);
         }
 
         return barcodeDto;

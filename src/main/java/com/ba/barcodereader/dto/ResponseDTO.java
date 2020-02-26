@@ -1,15 +1,29 @@
 package com.ba.barcodereader.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ResponseDTO {
     private List<String> barcodes;
     private List<String> files;
+
+    public ResponseDTO(List<String> barcodes, List<String> files) {
+        this.barcodes = barcodes;
+        this.files = files;
+    }
+
+    public List<String> getBarcodes() {
+        return barcodes;
+    }
+
+    public void setBarcodes(List<String> barcodes) {
+        this.barcodes = barcodes;
+    }
+
+    public List<String> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<String> files) {
+        this.files = files;
+    }
 }

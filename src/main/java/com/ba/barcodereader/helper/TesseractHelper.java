@@ -2,7 +2,6 @@ package com.ba.barcodereader.helper;
 
 import com.ba.barcodereader.exception.SystemException;
 import com.ba.barcodereader.props.Config;
-import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 
@@ -10,14 +9,12 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class TesseractHelper {
 
     private TesseractHelper() {
     }
 
     public static List<String> getFinalDataByLength(String text) {
-        log.info("All text data to search : {}", text);
 
         List<String> data = new ArrayList<>();
 
@@ -42,7 +39,7 @@ public class TesseractHelper {
         try {
             return tesseract.doOCR(subimage);
         } catch (TesseractException e) {
-            log.error("OCR not read image as text! e : {} ", e);
+            //log.error("OCR not read image as text! e : {} ", e);
             throw new SystemException("Could not read text!");
         }
     }

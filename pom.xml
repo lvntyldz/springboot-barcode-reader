@@ -29,7 +29,9 @@
         <commons-collections4.version>4.0</commons-collections4.version>
         <google-api-client.version>1.30.8</google-api-client.version>
         <google-cloud-vision.version>1.84.0</google-cloud-vision.version>
-        <lombok.version>1.18.12</lombok.version>
+        <!--
+                <lombok.version>1.18.12</lombok.version>
+        -->
         <jackson-databind.version>2.5.0</jackson-databind.version>
         <jackson-mapper-asl.version>1.9.2</jackson-mapper-asl.version>
     </properties>
@@ -79,12 +81,14 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--
+                <dependency>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                    <version>${lombok.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+        -->
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
         <dependency>
